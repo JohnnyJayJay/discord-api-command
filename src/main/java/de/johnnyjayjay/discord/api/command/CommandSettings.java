@@ -17,7 +17,6 @@ public class CommandSettings {
     private String prefix;
     private HashMap<String, ICommand> commands = new HashMap<String, ICommand>();
     private JDA jda;
-    private boolean useInfoCommand;
 
     private static String finalPrefix;
     private static HashMap<String, ICommand> finalCommands;
@@ -29,7 +28,7 @@ public class CommandSettings {
      * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
      * @param prefix The String you will have to put before every command in order to get your command execution registered.
      */
-    public CommandSettings(String prefix, JDA jda, boolean generateInfoCommand) {
+    public CommandSettings(String prefix, JDA jda) {
         if (prefix.isEmpty() || prefix == null) {
             throw new IllegalArgumentException("Prefix cannot be empty or null");
         } else
@@ -39,8 +38,6 @@ public class CommandSettings {
             throw new IllegalArgumentException("JDA cannot be null");
         } else
             this.jda = jda;
-        
-        this.useInfoCommand = generateInfoCommand;
     }
 
 
@@ -71,10 +68,6 @@ public class CommandSettings {
      * To "save" your settings, this is important, because otherwise your commands won't be registered.
      */
     public void activate() {
-
-        if (this.useInfoCommand) {
-            this.add("info", new InfoCommand());
-        }
         
         finalPrefix = this.prefix;
         finalCommands = this.commands;
