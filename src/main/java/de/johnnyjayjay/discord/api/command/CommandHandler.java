@@ -16,10 +16,10 @@ class CommandHandler {
         CommandContainer cmd = new CommandContainer(raw);
 
         if (cmd.command != null) {
-            if (cmd.command.canBeExecuted(event)) {
-                cmd.command.onCommand(event, cmd.args);
+            if (cmd.command.canBeExecuted(event, cmd.label)) {
+                cmd.command.onCommand(event, cmd.label, cmd.args);
             } else
-                event.getMessage().getTextChannel().sendMessage(cmd.command.info(event.getAuthor())).queue();
+                event.getChannel().sendMessage(cmd.command.info()).queue();
         }
     }
 
@@ -27,6 +27,7 @@ class CommandHandler {
     static class CommandContainer {
 
         ICommand command;
+        String label;
         String[] args;
 
         CommandContainer(String raw) {
@@ -43,6 +44,7 @@ class CommandHandler {
             String[] args = new String[argList.size() - 1];
             argList.subList(1, argList.size()).toArray(args);
 
+            this.label = label;
             this.args = args;
             if (getCommands().containsKey(label)) {
                 this.command = getCommands().get(label);
