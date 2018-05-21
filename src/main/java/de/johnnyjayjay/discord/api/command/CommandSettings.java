@@ -9,7 +9,7 @@ import java.util.HashMap;
  * To use this API, create a new object of this class and add your command classes by using add(...)
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 1.1
+ * @version 1.2
  */
 
 public class CommandSettings {
@@ -17,6 +17,7 @@ public class CommandSettings {
     private String prefix;
     private HashMap<String, ICommand> commands = new HashMap<String, ICommand>();
     private JDA jda;
+    private boolean useInfoCommand;
 
     private static String finalPrefix;
     private static HashMap<String, ICommand> finalCommands;
@@ -28,7 +29,7 @@ public class CommandSettings {
      * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
      * @param prefix The String you will have to put before every command in order to get your command execution registered.
      */
-    public CommandSettings(String prefix, JDA jda) {
+    public CommandSettings(String prefix, JDA jda, boolean generateInfoCommand) {
         if (prefix.isEmpty() || prefix == null) {
             throw new IllegalArgumentException("Prefix cannot be empty or null");
         } else
@@ -38,6 +39,8 @@ public class CommandSettings {
             throw new IllegalArgumentException("JDA cannot be null");
         } else
             this.jda = jda;
+        
+        this.useInfoCommand = generateInfoCommand;
     }
 
 
@@ -69,6 +72,10 @@ public class CommandSettings {
      */
     public void activate() {
 
+        if (this.useInfoCommand) {
+            this.add("info", new InfoCommand());
+        }
+        
         finalPrefix = this.prefix;
         finalCommands = this.commands;
 
