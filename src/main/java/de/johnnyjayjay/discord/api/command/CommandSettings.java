@@ -9,7 +9,7 @@ import java.util.HashMap;
  * To use this API, create a new object of this class and add your command classes by using add(...)
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 1.1
+ * @version 1.3
  */
 
 public class CommandSettings {
@@ -38,6 +38,7 @@ public class CommandSettings {
             throw new IllegalArgumentException("JDA cannot be null");
         } else
             this.jda = jda;
+
     }
 
 
