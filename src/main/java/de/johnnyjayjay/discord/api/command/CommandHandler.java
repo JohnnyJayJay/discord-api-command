@@ -16,10 +16,7 @@ class CommandHandler {
         CommandContainer cmd = new CommandContainer(raw);
 
         if (cmd.command != null) {
-            if (cmd.command.canBeExecuted(event, cmd.label)) {
-                cmd.command.onCommand(event, cmd.label, cmd.args);
-            } else
-                event.getChannel().sendMessage(cmd.command.info()).queue();
+            cmd.command.onCommand(event, cmd.label, cmd.args);
         }
     }
 
@@ -44,8 +41,8 @@ class CommandHandler {
             String[] args = new String[argList.size() - 1];
             argList.subList(1, argList.size()).toArray(args);
 
-            this.label = label;
             this.args = args;
+            this.label = label;
             if (getCommands().containsKey(label)) {
                 this.command = getCommands().get(label);
             }
