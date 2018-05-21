@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
  * An interface used to describe a command.
  * In order to use this API, every class which is supposed to execute commands must implement this interface.
  * @author Johnny_JayJay
- * @version 1.1
+ * @version 1.2
  */
 
 public interface ICommand {
@@ -18,6 +18,7 @@ public interface ICommand {
      * For instance, you can check on permissions by this.
      * This is not supposed to distinguish between different arguments.
      * @param event To decide whether your command will be executed, you get the event to work with.
+     * @param label In case you use one class for multiple commands, you can tell them apart by their label.
      * @return true: execute the command if it's called. false: do not execute it.
      */
     boolean canBeExecuted(GuildMessageReceivedEvent event, String label);
@@ -26,6 +27,7 @@ public interface ICommand {
      * Everything that happens if the command is executed should be written here.
      * This is also the place for argument handling.
      * @param event By this, you are given access to the event, in case you want to get its belongings or even modify it.
+     * @param label In case you use one class for multiple commands, you can tell them apart by their label.
      * @param args Everything after the label. [prefix][label] [arg1] [arg2] ... [argN]
      */
     void onCommand(GuildMessageReceivedEvent event, String label, String[] args);
