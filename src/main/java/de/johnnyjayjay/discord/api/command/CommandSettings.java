@@ -1,5 +1,6 @@
 package de.johnnyjayjay.discord.api.command;
 
+import com.sun.istack.internal.NotNull;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 
@@ -9,7 +10,7 @@ import java.util.HashMap;
  * To use this API, create a new object of this class and add your command classes by using add(...)
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 1.3
+ * @version 1.4
  */
 
 public class CommandSettings {
@@ -28,16 +29,13 @@ public class CommandSettings {
      * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
      * @param prefix The String you will have to put before every command in order to get your command execution registered.
      */
-    public CommandSettings(String prefix, JDA jda) {
-        if (prefix.isEmpty() || prefix == null) {
-            throw new IllegalArgumentException("Prefix cannot be empty or null");
-        } else
+    public CommandSettings(@NotNull String prefix, @NotNull JDA jda) {
+        if (prefix.isEmpty()) {
+            throw new IllegalArgumentException("Prefix cannot be empty");
+        } else {
             this.prefix = prefix;
-
-        if (jda == null) {
-            throw new IllegalArgumentException("JDA cannot be null");
-        } else
             this.jda = jda;
+        }
 
     }
 
@@ -50,11 +48,9 @@ public class CommandSettings {
      * @param command An instance of your command class which implements ICommand.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings add(String label, ICommand command) {
-        if (label.isEmpty() || label == null || label.contains(" ")) {
-            throw new IllegalArgumentException("Command label cannot be empty, null or consist of multiple words");
-        } else if (command == null) {
-            throw new IllegalArgumentException("Command cannot be null");
+    public CommandSettings add(@NotNull String label, @NotNull ICommand command) {
+        if (label.isEmpty() || label.contains(" ")) {
+            throw new IllegalArgumentException("Command label cannot be empty or consist of multiple words");
         } else
             commands.put(label, command);
 
@@ -63,10 +59,10 @@ public class CommandSettings {
 
 
     /**
-     * Sets the prefix and the command HashMap for the rest of the API.
+     * Sets the prefix and the command HashMap for the rest of the API. This is the last method to call when having finished setting up your commands.
      * <p>
-     * Note that you shouldn't create new CommandSettings and activate them after having already activated one. This can cause problems.
-     * To "save" your settings, this is important, because otherwise your commands won't be registered.
+     * Note that you shouldn't create new CommandSettings and activate them after having already activated one. This may cause problems.
+     * To "save" your settings, using this is important, because otherwise your commands won't be registered.
      */
     public void activate() {
 
