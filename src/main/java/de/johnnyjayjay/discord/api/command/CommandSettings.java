@@ -2,7 +2,6 @@ package de.johnnyjayjay.discord.api.command;
 
 import com.sun.istack.internal.NotNull;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
 
 import java.util.HashMap;
 
@@ -10,15 +9,16 @@ import java.util.HashMap;
  * To use this API, create a new object of this class and add your command classes by using add(...)
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 1.4
+ * @version 1.6
  */
 
 public class CommandSettings {
 
     private String prefix;
-    private HashMap<String, ICommand> commands = new HashMap<String, ICommand>();
+    private HashMap<String, ICommand> commands = new HashMap<>();
     private JDA jda;
 
+    private static boolean used = false;
     private static String finalPrefix;
     private static HashMap<String, ICommand> finalCommands;
 
@@ -36,9 +36,7 @@ public class CommandSettings {
             this.prefix = prefix;
             this.jda = jda;
         }
-
     }
-
 
     /**
      * This method is used to add commands from your project. Every command which is supposed to be active should be added by this.
@@ -49,9 +47,9 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings add(@NotNull String label, @NotNull ICommand command) {
-        if (label.isEmpty() || label.contains(" ")) {
+        if (label.isEmpty() || label.contains(" "))
             throw new IllegalArgumentException("Command label cannot be empty or consist of multiple words");
-        } else
+        else
             commands.put(label, command);
 
         return this;
@@ -65,12 +63,13 @@ public class CommandSettings {
      * To "save" your settings, using this is important, because otherwise your commands won't be registered.
      */
     public void activate() {
-
-        finalPrefix = this.prefix;
-        finalCommands = this.commands;
-
-        jda.addEventListener(new CommandListener());
-
+        if (!used) {
+            finalPrefix = this.prefix;
+            finalCommands = this.commands;
+            jda.addEventListener(new CommandListener());
+            used = true;
+        } else
+            throw new CommandSetException("CommandSettings already activated!");
     }
 
     static String getPrefix() {
