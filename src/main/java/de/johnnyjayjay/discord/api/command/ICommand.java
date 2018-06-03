@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
  * An interface used to describe a command.
  * In order to use this API, every class which is supposed to execute commands must implement this interface.
  * @author Johnny_JayJay
- * @version 1.4
+ * @version 1.6
  */
 
 public interface ICommand {
@@ -21,8 +21,5 @@ public interface ICommand {
      * @param args Everything after the label. [prefix][label] [arg1] [arg2] ... [argN]
      */
     void onCommand(GuildMessageReceivedEvent event, String label, String[] args);
-
-
-
 
 }
