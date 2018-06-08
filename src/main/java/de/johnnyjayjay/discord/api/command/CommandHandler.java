@@ -22,9 +22,9 @@ class CommandHandler {
 
     private static class CommandContainer {
 
-        ICommand command;
-        String label;
-        String[] args;
+        private final ICommand command;
+        private final String label;
+        private final String[] args;
 
         CommandContainer(String raw) {
 
