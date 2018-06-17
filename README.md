@@ -1,4 +1,7 @@
 # discord-api-command
+
+VERSION: 2.5
+
 A simple Command API for the JDA
 
 To use it, download the .jar file from the folder out. I'm currently working on deploying it on a maven repository so it's even easier to implement.
