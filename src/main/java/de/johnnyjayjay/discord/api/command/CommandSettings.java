@@ -71,7 +71,7 @@ public class CommandSettings {
      * Use this method to set the prefix.
      * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.
      */
-    public void setPrefix(String prefix) {
+    public void setPrefix(@Nonnull String prefix) {
         if (prefix.isEmpty())
             throw new CommandSetException("Prefix cannot be empty");
         else
