@@ -15,7 +15,6 @@ public class Command {
     private String[] args;
 
     Command(String raw, CommandSettings settings) {
-        this.settings = settings;
         var argsWithoutPrefix = raw.replaceFirst(settings.getPrefix(), "").split(" ");
         var commandLabel = argsWithoutPrefix[0];
         var argList = Arrays.asList(argsWithoutPrefix);
