@@ -13,7 +13,6 @@ public class Command {
     private ICommand command;
     private String label;
     private String[] args;
-    private CommandSettings settings;
 
     Command(String raw, CommandSettings settings) {
         this.settings = settings;
