@@ -5,8 +5,9 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 /**
+ * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command.
  * @author Johnny_JayJay
- * @version 2.5
+ * @version 2.9
  */
 public class CommandEvent extends GuildMessageReceivedEvent {
 
