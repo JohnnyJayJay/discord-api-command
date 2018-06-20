@@ -25,10 +25,11 @@ class CommandListener extends ListenerAdapter {
                 cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
                         event.getMember(), event.getChannel(), cmd.getArgs());
             } else if (settings.useHelpCommand() && settings.getHelpLabels().contains(cmd.getLabel())) {
-                if (cmd.getArgs().length == 0)
+                if (cmd.getArgs().length == 0) {
                     this.sendInfo(event.getChannel(), null, null);
-                else if (cmd.getArgs().length == 1 && settings.getCommands().containsKey(cmd.getArgs()[0]))
-                    this.sendInfo(event.getChannel(), cmd.getExecutor(), cmd.getLabel());
+                } else if (cmd.getArgs().length == 1 && settings.getCommands().containsKey(cmd.getArgs()[0])) {
+                    this.sendInfo(event.getChannel(), settings.getCommands().get(cmd.getArgs()[0]), cmd.getArgs()[0]);
+                }
             }
         }
     }
@@ -36,14 +37,14 @@ class CommandListener extends ListenerAdapter {
     private void sendInfo(TextChannel channel, ICommand command, String label) {
         var builder = new EmbedBuilder().setTitle("Help");
         if (command == null) {
-            builder.appendDescription(format("To learn more about a specific command, type `%shelp <label>`\n", settings.getPrefix()))
+            String helpLabels = format("[%s]", String.join("|", settings.getHelpLabels().toArray(new String[settings.getHelpLabels().size()])));
+            builder.appendDescription(format("To learn more about a specific command, just call `%s%s <label>`.\n", settings.getPrefix(), helpLabels))
                     .appendDescription("The following commands are currently available:\n");
-            var commandLabels = settings.getCommands().keySet();
-            String commands = "```" + String.join("\n", commandLabels.toArray(new String[commandLabels.size()])) + "```";
-            builder.addField("Commands", commands, false);
+            var commandLabels = settings.getCommands().keySet().toArray(new String[settings.getCommands().keySet().size()]);
+            builder.addField("Commands", format("```\n%s%s```", settings.getPrefix(), String.join(format("\n%s", settings.getPrefix()), commandLabels)), false);
             channel.sendMessage(builder.build()).queue();
         } else {
-            builder.appendDescription(format("Command Info: %s\n", label))
+            builder.appendDescription(format("Command Info for: `%s`\n\n", label))
                     .appendDescription(command.info());
             channel.sendMessage(builder.build()).queue();
         }
