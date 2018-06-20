@@ -5,6 +5,8 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import static java.lang.String.format;
+
 
 class CommandListener extends ListenerAdapter {
 
@@ -34,13 +36,14 @@ class CommandListener extends ListenerAdapter {
     private void sendInfo(TextChannel channel, ICommand command, String label) {
         var builder = new EmbedBuilder().setTitle("Help");
         if (command == null) {
-            builder.setDescription("The following commands are currently available:\n");
+            builder.appendDescription(format("To learn more about a specific command, type `%shelp <label>`\n", settings.getPrefix()))
+                    .appendDescription("The following commands are currently available:\n");
             var commandLabels = settings.getCommands().keySet();
             String commands = "```" + String.join("\n", commandLabels.toArray(new String[commandLabels.size()])) + "```";
             builder.addField("Commands", commands, false);
             channel.sendMessage(builder.build()).queue();
         } else {
-            builder.appendDescription(String.format("Command Info: %s\n", label))
+            builder.appendDescription(format("Command Info: %s\n", label))
                     .appendDescription(command.info());
             channel.sendMessage(builder.build()).queue();
         }
