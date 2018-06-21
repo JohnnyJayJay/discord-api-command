@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.JDA;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,11 +17,10 @@ import java.util.Set;
 
 public class CommandSettings {
 
-
     private String prefix;
 
     private Set<String> helpLabels;
-    private HashMap<String, ICommand> commands;
+    private Map<String, ICommand> commands;
 
     private JDA jda;
     private CommandListener listener;
@@ -55,8 +55,8 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings setHelpLabel(String... labels) {
-        for (String label : labels) {
-            helpLabels.add(label);
+        for (String s : labels) {
+            helpLabels.add(s);
         }
         return this;
     }
@@ -156,19 +156,19 @@ public class CommandSettings {
             throw new CommandSetException("CommandSettings weren't activated yet and can therefore not be deactivated!");
     }
 
-    Set<String> getHelpLabels() {
+    protected Set<String> getHelpLabels() {
         return helpLabels;
     }
 
-    boolean useHelpCommand() {
+    protected boolean useHelpCommand() {
         return useHelpCommand;
     }
 
-    String getPrefix() {
+    protected String getPrefix() {
         return prefix;
     }
 
-    HashMap<String, ICommand> getCommands() {
+    protected Map<String, ICommand> getCommands() {
         return commands;
     }
 
