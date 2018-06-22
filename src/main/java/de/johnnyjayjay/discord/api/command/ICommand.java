@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
  * An interface used to describe a command class.
  * In order to use this API, every class which is supposed to execute commands must implement this interface.
  * @author Johnny_JayJay
- * @version 2.9
+ * @version 3.0
  */
 
 public interface ICommand {

@@ -6,7 +6,7 @@ import java.util.Arrays;
  * Describes an executed Command. <p>
  * Is used to parse a message which seems to be a command.
  * @author Johnny_JayJay
- * @version 2.9
+ * @version 3.0
  */
 public class Command {
 
@@ -14,8 +14,8 @@ public class Command {
     private String label;
     private String[] args;
 
-    Command(String raw, CommandSettings settings) {
-        var argsWithoutPrefix = raw.replaceFirst(settings.getPrefix(), "").split(" ");
+    Command(String raw, String prefix, CommandSettings settings) {
+        var argsWithoutPrefix = raw.replaceFirst(prefix, "").split(" ");
         var commandLabel = argsWithoutPrefix[0];
         var argList = Arrays.asList(argsWithoutPrefix);
         var args = argList.subList(1, argList.size()).toArray(new String[argList.size() - 1]);
