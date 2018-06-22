@@ -1,7 +1,18 @@
 # discord-api-command
 A simple Command API for the JDA
 
-VERSION: 2.9
+VERSION: 3.0
+
+Features:
+- easy command implementation
+- good performance
+- custom prefixes for different guilds (if wanted)
+- auto-generated help command (if wanted)
+- deactivation of all commands by one simple method (and activation the same way)
+- high flexibility due to `CommandSettings`
+- prevention of exceptions and errors by substantial validation and exception handling
+- if something goes wrong, there is the runtimeexception `CommandSetException` which tells you exactly what the problem is
+
 
 To use it, download the .jar file from the folder out. I'm currently working on deploying it on a maven repository so it's even easier to implement.
 On how to use it:
