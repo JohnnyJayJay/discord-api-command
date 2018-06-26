@@ -63,7 +63,7 @@ public class CommandSettings {
     /**
      * This is the constructor.
      * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
-     * @param jda Put your active ShardManager here. This is important for the activation of the CommandListener.
+     * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
      * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
      * @param useHelpCommand Set this to true, if you want to use the auto-generated help command of this API. You can configure this by setting the help
      *                       labels with setHelpLabel(String...) and by overriding the method info() in your command classes.
