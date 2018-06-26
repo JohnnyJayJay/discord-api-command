@@ -1,6 +1,7 @@
 package de.johnnyjayjay.discord.api.command;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Describes an executed Command. <p>
@@ -15,10 +16,10 @@ public class Command {
     private String[] args;
 
     Command(String raw, String prefix, CommandSettings settings) {
-        var argsWithoutPrefix = raw.replaceFirst(prefix, "").split(" ");
-        var commandLabel = argsWithoutPrefix[0];
-        var argList = Arrays.asList(argsWithoutPrefix);
-        var args = argList.subList(1, argList.size()).toArray(new String[argList.size() - 1]);
+        String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split(" ");
+        String commandLabel = settings.labelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];
+        List<String> argList = Arrays.asList(argsWithoutPrefix);
+        String[] args = argList.subList(1, argList.size()).toArray(new String[argList.size() - 1]);
         this.args = args;
         this.label = commandLabel;
         if (settings.getCommands().containsKey(commandLabel)) {

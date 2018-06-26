@@ -1,5 +1,6 @@
 package de.johnnyjayjay.discord.api.command;
 
+import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 
 import javax.annotation.Nonnull;
@@ -17,6 +18,8 @@ import java.util.Set;
 
 public class CommandSettings {
 
+    private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
+    private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
     // Regex which only matches valid prefixes
     public static final String VALID_PREFIX = "([^\\\\+*^|$?])+";
     // Regex which only matches valid command labels
@@ -29,33 +32,57 @@ public class CommandSettings {
 
     private Map<String, ICommand> commands; // String: command label, ICommand: command class
 
-    private JDA jda;
+    private Object jda;
+
     private CommandListener listener;
 
     private boolean activated; // ...is this instance activated?
+    private boolean useShardManager;
+
 
     private boolean useHelpCommand;
-    private boolean useCustomPrefixes;
+    private boolean labelIgnoreCase;
 
+
+    /**
+     * This is the optional constructor in case you are sharding your bot.
+     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
+     * @param shardManager Put your active ShardManager here. This is important for the activation of the CommandListener.
+     * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
+     * @param useHelpCommand Set this to true, if you want to use the auto-generated help command of this API. You can configure this by setting the help
+     *                       labels with setHelpLabel(String...) and by overriding the method info() in your command classes.
+     * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
+     *                       "FOO", "FoO" and so on.
+     */
+    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean useHelpCommand, boolean labelIgnoreCase) {
+        this(defaultPrefix, useHelpCommand, labelIgnoreCase);
+        this.jda = shardManager;
+        this.useShardManager = true;
+    }
 
     /**
      * This is the constructor.
      * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
-     * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
+     * @param jda Put your active ShardManager here. This is important for the activation of the CommandListener.
      * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
      * @param useHelpCommand Set this to true, if you want to use the auto-generated help command of this API. You can configure this by setting the help
      *                       labels with setHelpLabel(String...) and by overriding the method info() in your command classes.
-     * @param useCustomPrefixes Set this to true, if you want to have the possibility to add custom prefixes for each guild. If you didn't set a prefix for a guild, it will look
-     *                         for the default prefix.
+     * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
+     *      *                 "FOO", "FoO" and so on.
      */
-    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean useHelpCommand, boolean useCustomPrefixes) {
+    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean useHelpCommand, boolean labelIgnoreCase) {
+        this(defaultPrefix, useHelpCommand, labelIgnoreCase);
+        this.jda = jda;
+        this.useShardManager = false;
+    }
+
+    private CommandSettings(@Nonnull String defaultPrefix, boolean useHelpCommand, boolean labelIgnoreCase) {
         this.commands = new HashMap<>();
         this.listener = new CommandListener(this);
         this.activated = false;
         this.setDefaultPrefix(defaultPrefix);
-        this.jda = jda;
         this.useHelpCommand = useHelpCommand;
-        this.useCustomPrefixes = useCustomPrefixes;
+        this.labelIgnoreCase = labelIgnoreCase;
         this.helpLabels = new HashSet<>();
         this.prefixMap = new HashMap<>();
     }
@@ -70,7 +97,7 @@ public class CommandSettings {
             if (label.matches(VALID_LABEL))
                 helpLabels.add(label);
             else
-                throw new CommandSetException("Help label cannot be empty, consist of multiple words or contain new lines!");
+                throw new CommandSetException(INVALID_LABEL_MESSAGE);
         }
         return this;
     }
@@ -86,9 +113,9 @@ public class CommandSettings {
      */
     public CommandSettings put(@Nonnull ICommand command, @Nonnull String label) {
         if (label.matches(VALID_LABEL))
-            commands.put(label, command);
+            commands.put(labelIgnoreCase ? label.toLowerCase() : label, command);
         else
-            throw new CommandSetException("Command label cannot be empty, consist of multiple words or contain new lines!");
+            throw new CommandSetException(INVALID_LABEL_MESSAGE);
 
         return this;
     }
@@ -112,7 +139,7 @@ public class CommandSettings {
      * @return true, if the label was successfully removed. false, if the given label doesn't exist.
      */
     public boolean remove(@Nonnull String label) {
-        return commands.remove(label) != null;
+        return commands.remove(labelIgnoreCase ? label.toLowerCase() : label) != null;
     }
 
     /**
@@ -138,7 +165,7 @@ public class CommandSettings {
         if (prefix.matches(VALID_PREFIX))
             this.defaultPrefix = prefix;
         else
-            throw new CommandSetException("Prefix cannot be empty or contain the characters +*^|$\\");
+            throw new CommandSetException(INVALID_PREFIX_MESSAGE);
     }
 
     /**
@@ -150,7 +177,7 @@ public class CommandSettings {
      */
     public void setCustomPrefix(long guildId, String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
-            throw new CommandSetException("Prefix cannot be empty or contain the characters +*^|$\\");
+            throw new CommandSetException(INVALID_PREFIX_MESSAGE);
         prefixMap.put(guildId, prefix);
     }
 
@@ -162,7 +189,10 @@ public class CommandSettings {
      */
     public void activate() {
         if (!activated) {
-            jda.addEventListener(listener);
+            if (useShardManager)
+                ((ShardManager)jda).addEventListener(listener);
+            else
+                ((JDA)jda).addEventListener(listener);
             activated = true;
         } else
             throw new CommandSetException("CommandSettings already activated!");
@@ -175,7 +205,10 @@ public class CommandSettings {
      */
     public void deactivate() {
         if (activated) {
-            jda.removeEventListener(listener);
+            if (useShardManager)
+                ((ShardManager)jda).removeEventListener(listener);
+            else
+                ((JDA)jda).removeEventListener(listener);
             activated = false;
         } else
             throw new CommandSetException("CommandSettings weren't activated yet and can therefore not be deactivated!");
@@ -187,7 +220,7 @@ public class CommandSettings {
      * @return the default prefix, if there is no custom prefix set for the given guild id. Otherwise, it returns the custom prefix.
      */
     public String getPrefix(long guildId) {
-        return (useCustomPrefixes && prefixMap.get(guildId) != null) ? prefixMap.get(guildId) : defaultPrefix;
+        return prefixMap.get(guildId) != null ? prefixMap.get(guildId) : defaultPrefix;
     }
 
     /**
@@ -196,6 +229,10 @@ public class CommandSettings {
      */
     public String getPrefix() {
         return defaultPrefix;
+    }
+
+    protected boolean labelIgnoreCase() {
+        return labelIgnoreCase;
     }
 
     protected Set<String> getHelpLabels() {

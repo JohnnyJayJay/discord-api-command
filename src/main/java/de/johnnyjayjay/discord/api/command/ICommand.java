@@ -28,7 +28,7 @@ public interface ICommand {
      * should return info about the command, such as usage, description, permissions, aliases...
      */
     default String info() {
-        return "No info, description or help set";
+        return "No info, description or help set for this command";
     }
 
 }
