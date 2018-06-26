@@ -8,6 +8,7 @@ Features:
 - good performance
 - custom prefixes for different guilds (if wanted)
 - auto-generated help command (if wanted)
+- Support of either JDA or ShardManager
 - deactivation of all commands by one simple method (and activation the same way)
 - high flexibility due to `CommandSettings`
 - prevention of exceptions and errors by substantial validation and exception handling
