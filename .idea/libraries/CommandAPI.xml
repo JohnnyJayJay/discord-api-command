@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="CommandAPI">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/out/artifacts/CommandAPI_jar/CommandAPI.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
