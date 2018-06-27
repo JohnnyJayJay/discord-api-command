@@ -81,7 +81,7 @@ Varargs can only be used for the last argument. And yes, this is Varargs.
 In this case, someone could write `!ping` in a channel the bot is also in and the bot would respond with `Pong! @Member`.
 This person could also type `!pingpong` or `!p`. These are aliases.
 
-What if we wanted to use this help command? Then we only have to adjust two things:
+What if we wanted to use this help command? Then we only have to adjust one thing:
 ```java
 CommandSettings settings = new CommandSettings("!", jda, true); 
 settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
