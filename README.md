@@ -90,7 +90,7 @@ settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case inse
 ```
 
 If someone either calls `!help`, `!helpme` or `!h`, a list of all commands will be displayed along with the information that more help can be received by adding a command label 
-as the first argument (e.g. `!help ping`). In this case, the content od the method `info()` will be shown. If this method is not overwritten, it will show the default text which
+as the first argument (e.g. `!help ping`). In this case, the content of the method `info()` will be shown. If this method is not overwritten, it will show the default text which
 is "No info, description or help set for this command". If you think that this kind of help command is too basic or you dislike it for whatever reasons, just don't set any help 
 labels and it will not be used. You can still make your own help command implementation of course.
 
@@ -118,7 +118,7 @@ A `CommandSetException` is thrown if:
     - labels that contain any kind of blank spaces or are just an empty String
 - an instance of `CommandSettings` is activated or deactivated twice (which is not possible)
 
-If you don't want to have any exceptions concerning prefixes and labels, it is recommended to check whether they match `CommandSettings.VALID_PREFIY` 
+If you don't want to have any exceptions concerning prefixes and labels, it is recommended to check whether they match `CommandSettings.VALID_PREFIX` 
 or `CommandSettings.VALID_LABEL`.
 
 ```java
