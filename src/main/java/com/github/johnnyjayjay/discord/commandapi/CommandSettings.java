@@ -39,8 +39,6 @@ public class CommandSettings {
     private boolean activated; // ...is this instance activated?
     private boolean useShardManager;
 
-
-    private boolean useHelpCommand;
     private boolean labelIgnoreCase;
 
 
@@ -49,13 +47,11 @@ public class CommandSettings {
      * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
      * @param shardManager Put your active ShardManager here. This is important for the activation of the CommandListener.
      * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
-     * @param useHelpCommand Set this to true, if you want to use the auto-generated help command of this API. You can configure this by setting the help
-     *                       labels with setHelpLabel(String...) and by overriding the method info() in your command classes.
      * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
      *                       "FOO", "FoO" and so on.
      */
-    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean useHelpCommand, boolean labelIgnoreCase) {
-        this(defaultPrefix, useHelpCommand, labelIgnoreCase);
+    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean labelIgnoreCase) {
+        this(defaultPrefix, labelIgnoreCase);
         this.jda = shardManager;
         this.useShardManager = true;
     }
@@ -65,23 +61,20 @@ public class CommandSettings {
      * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
      * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
      * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
-     * @param useHelpCommand Set this to true, if you want to use the auto-generated help command of this API. You can configure this by setting the help
-     *                       labels with setHelpLabel(String...) and by overriding the method info() in your command classes.
      * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
      *      *                 "FOO", "FoO" and so on.
      */
-    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean useHelpCommand, boolean labelIgnoreCase) {
-        this(defaultPrefix, useHelpCommand, labelIgnoreCase);
+    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean labelIgnoreCase) {
+        this(defaultPrefix, labelIgnoreCase);
         this.jda = jda;
         this.useShardManager = false;
     }
 
-    private CommandSettings(@Nonnull String defaultPrefix, boolean useHelpCommand, boolean labelIgnoreCase) {
+    private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase) {
         this.commands = new HashMap<>();
         this.listener = new CommandListener(this);
         this.activated = false;
         this.setDefaultPrefix(defaultPrefix);
-        this.useHelpCommand = useHelpCommand;
         this.labelIgnoreCase = labelIgnoreCase;
         this.helpLabels = new HashSet<>();
         this.prefixMap = new HashMap<>();
@@ -92,7 +85,7 @@ public class CommandSettings {
      * @param labels One or more labels which may later be called by members to list all commands or to show info about one specific command.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings setHelpLabel(String... labels) {
+    public CommandSettings setHelpLabels(@Nonnull String... labels) {
         for (String label : labels) {
             if (label.matches(VALID_LABEL))
                 helpLabels.add(label);
@@ -107,13 +100,13 @@ public class CommandSettings {
      * <p>
      * The two parameters will be put in a HashMap which is used by the API to notice commands.
      * @param label The label which describes your command, i.e. the string after the prefix [prefix][label].
-     * @param command An instance of your command class which implements ICommand.
+     * @param executor An instance of your command class which implements ICommand.
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException If the label is empty or consists of multiple words.
      */
-    public CommandSettings put(@Nonnull ICommand command, @Nonnull String label) {
+    public CommandSettings put(@Nonnull ICommand executor, @Nonnull String label) {
         if (label.matches(VALID_LABEL))
-            commands.put(labelIgnoreCase ? label.toLowerCase() : label, command);
+            commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
             throw new CommandSetException(INVALID_LABEL_MESSAGE);
 
@@ -123,13 +116,13 @@ public class CommandSettings {
     /**
      * Use this method to add commands with aliases. <p>
      * Works like put(ICommand, String) but adds multiple labels to the same command.
-     * @param command An instance of your command class which implements ICommand.
+     * @param executor An instance of your command class which implements ICommand.
      * @param labels One or more labels. This will throw a CommandSetException, if the label is empty or contains spaces.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings put(@Nonnull ICommand command, @Nonnull String... labels) {
+    public CommandSettings put(@Nonnull ICommand executor, @Nonnull String... labels) {
         for (String label : labels)
-            this.put(command, label);
+            this.put(executor, label);
         return this;
     }
 
@@ -159,7 +152,7 @@ public class CommandSettings {
     /**
      * Use this method to set the default prefix.
      * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.
-     * @throws CommandSetException if the prefix is empty.
+     * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
     public void setDefaultPrefix(@Nonnull String prefix) {
         if (prefix.matches(VALID_PREFIX))
@@ -173,9 +166,9 @@ public class CommandSettings {
      * You can remove the custom prefix from a guild by setting its prefix to null.
      * @param guildId The guild id as a long.
      * @param prefix The prefix to be set.
-     * @throws CommandSetException if a non-null prefix is empty.
+     * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
-    public void setCustomPrefix(long guildId, String prefix) {
+    public void setCustomPrefix(long guildId, @Nonnull String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
             throw new CommandSetException(INVALID_PREFIX_MESSAGE);
         prefixMap.put(guildId, prefix);
@@ -237,10 +230,6 @@ public class CommandSettings {
 
     protected Set<String> getHelpLabels() {
         return helpLabels;
-    }
-
-    protected boolean useHelpCommand() {
-        return useHelpCommand;
     }
 
     protected Map<String, ICommand> getCommands() {
