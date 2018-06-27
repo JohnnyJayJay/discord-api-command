@@ -17,7 +17,7 @@
 
 ## On how to add this to your project
 #### Adding as a library
-You can download the .jar-file in [this directory](https://github.com/JohnnyJayJay/discord-api-command/tree/master/out/artifacts/CommandAPI_jar) and add it to the project
+You can download the .jar-file in [this directory](https://github.com/JohnnyJayJay/discord-api-command/tree/master/builds) and add it to the project
  by performing the following steps:
  1. Create a new directory in your project folder
  2. Copy the jar-file to it
