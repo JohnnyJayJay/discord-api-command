@@ -1,6 +1,7 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -26,7 +27,7 @@ class CommandListener extends ListenerAdapter {
             if (cmd.getExecutor() != null) {
                 cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
                         event.getMember(), event.getChannel(), cmd.getArgs());
-            } else if (settings.getHelpLabels().contains(cmd.getLabel())) {
+            } else if (settings.getHelpLabels().contains(cmd.getLabel()) && event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
                 this.sendInfo(event.getChannel(), prefix, cmd.getArgs());
             }
         }
