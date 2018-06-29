@@ -1,8 +1,8 @@
 # discord-api-command
 **A simple Command API for the JDA**
 
-*CURRENT VERSION: **3.0_1***<p>
-*Other versions: **3.0***
+*CURRENT VERSION: **3.0_2***<p>
+*Other versions: **3.0_1**, **3.0***
 
 ## Features:
 - easy command implementation
