@@ -17,7 +17,7 @@
 
 ## On how to add this to your project
 #### Adding as a library
-You can download the .jar-file in [this directory](https://github.com/JohnnyJayJay/discord-api-command/tree/master/out/artifacts/CommandAPI_jar) and add it to the project
+You can download the .jar-file in [this directory](https://github.com/JohnnyJayJay/discord-api-command/tree/master/builds) and add it to the project
  by performing the following steps:
  1. Create a new directory in your project folder
  2. Copy the jar-file to it
@@ -81,7 +81,7 @@ Varargs can only be used for the last argument. And yes, this is Varargs.
 In this case, someone could write `!ping` in a channel the bot is also in and the bot would respond with `Pong! @Member`.
 This person could also type `!pingpong` or `!p`. These are aliases.
 
-What if we wanted to use this help command? Then we only have to adjust two things:
+What if we wanted to use this help command? Then we only have to adjust one thing:
 ```java
 CommandSettings settings = new CommandSettings("!", jda, true); 
 settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
@@ -91,8 +91,7 @@ settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case inse
 
 If someone either calls `!help`, `!helpme` or `!h`, a list of all commands will be displayed along with the information that more help can be received by adding a command label 
 as the first argument (e.g. `!help ping`). In this case, the content of the method `info(Guild)` will be shown. If this method is not overwritten, it will show the default text 
-which
-is "No info, description or help set for this command". If you think that this kind of help command is too basic or you dislike it for whatever reasons, just don't set any help 
+which is "No info, description or help set for this command". If you think that this kind of help command is too basic or you dislike it for whatever reasons, just don't set any help 
 labels and it will not be used. You can still make your own help command implementation of course.
 
 Note that the help command doesn't have priority over normal commands. Or, to put it in another way: if a help label is the same as a normal command label, the normal command 
@@ -119,7 +118,7 @@ A `CommandSetException` is thrown if:
     - labels that contain any kind of blank spaces or are just an empty String
 - an instance of `CommandSettings` is activated or deactivated twice (which is not possible)
 
-If you don't want to have any exceptions concerning prefixes and labels, it is recommended to check whether they match `CommandSettings.VALID_PREFIY` 
+If you don't want to have any exceptions concerning prefixes and labels, it is recommended to check whether they match `CommandSettings.VALID_PREFIX` 
 or `CommandSettings.VALID_LABEL`.
 
 ```java
