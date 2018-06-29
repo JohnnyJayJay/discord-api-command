@@ -1,6 +1,7 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -21,13 +22,15 @@ class CommandListener extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         String raw = event.getMessage().getContentRaw();
         String prefix = settings.getPrefix(event.getGuild().getIdLong());
-        if (raw.startsWith(prefix) && !event.getAuthor().isBot()) {
-            Command cmd = new Command(raw, prefix, settings);
-            if (cmd.getExecutor() != null) {
-                cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
-                        event.getMember(), event.getChannel(), cmd.getArgs());
-            } else if (settings.getHelpLabels().contains(cmd.getLabel())) {
-                this.sendInfo(event.getChannel(), prefix, cmd.getArgs());
+        if (!event.getAuthor().isBot()) {
+            if (raw.startsWith(prefix)) {
+                CommandEvent.Command cmd = new CommandEvent.Command(raw, prefix, settings);
+                if (cmd.getExecutor() != null) {
+                    cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
+                            event.getMember(), event.getChannel(), cmd.getArgs());
+                } else if (settings.getHelpLabels().contains(cmd.getLabel()) && event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
+                    this.sendInfo(event.getChannel(), prefix, cmd.getArgs());
+                }
             }
         }
     }
@@ -43,7 +46,7 @@ class CommandListener extends ListenerAdapter {
             channel.sendMessage(builder.build()).queue();
         } else if (args.length == 1 && settings.getCommands().containsKey(args[0])) {
             builder.appendDescription(format("**Command Info for:** `%s`\n\n", args[0]))
-                    .appendDescription(settings.getCommands().get(args[0]).info());
+                    .appendDescription(settings.getCommands().get(args[0]).info(channel.getGuild()));
             channel.sendMessage(builder.build()).queue();
         }
     }
