@@ -40,7 +40,7 @@ And that's it!
 Using the CommandAPI is quite easy. All you need to do is writing your own commands, the rest won't concern you.<p>
 Command classes have to implement the interface `ICommand`, which represents a class whose objects are able to execute commands.
 
-This interface contains two methods, `void onCommand(CommandEvent, Member, TextChannel, String[])` and `String info()`.
+This interface contains two methods, `void onCommand(CommandEvent, Member, TextChannel, String[])` and `String info(Guild)`.
 The first method **must** be implemented. It will be called in case an object of this class is registered as a command executor and its label gets called by a member of a guild 
 the bot is on. So, an example implementation of `ICommand` might look like this:
 
@@ -55,7 +55,7 @@ public class PingCommand implements ICommand {
     
     // Optional
     @Override
-    public String info() {
+    public String info(Guild guild) {
         return "This command pongs you. Try it out!";
     }
 }
@@ -90,7 +90,8 @@ settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case inse
 ```
 
 If someone either calls `!help`, `!helpme` or `!h`, a list of all commands will be displayed along with the information that more help can be received by adding a command label 
-as the first argument (e.g. `!help ping`). In this case, the content od the method `info()` will be shown. If this method is not overwritten, it will show the default text which
+as the first argument (e.g. `!help ping`). In this case, the content of the method `info(Guild)` will be shown. If this method is not overwritten, it will show the default text 
+which
 is "No info, description or help set for this command". If you think that this kind of help command is too basic or you dislike it for whatever reasons, just don't set any help 
 labels and it will not be used. You can still make your own help command implementation of course.
 
