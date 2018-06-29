@@ -2,6 +2,8 @@
 
 ### 3.0_2
 - Added permissions check before printing help messages
+- Added argument to `ICommand`-method `String info()` - the guild (to make it possible to get the custom prefix)
+- Made class `Command` inner class of `CommandEvent`, because it not really has a usage anywhere else
 - Added changelog (lul)
 
 ### 3.0_1
