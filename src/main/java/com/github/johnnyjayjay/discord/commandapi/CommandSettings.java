@@ -18,12 +18,13 @@ import java.util.Set;
 
 public class CommandSettings {
 
-    private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
-    private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
     // Regex which only matches valid prefixes
     public static final String VALID_PREFIX = "([^\\\\+*^|$?])+";
     // Regex which only matches valid command labels
     public static final String VALID_LABEL = "([^\\s\\n\\t])+";
+
+    private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
+    private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
 
     private String defaultPrefix;
 
