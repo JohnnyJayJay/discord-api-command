@@ -15,7 +15,8 @@ public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException {
         JDA jda = new JDABuilder(AccountType.BOT).setToken("VERY-SECRET-TOKEN-PLS-DONT-STEAL").buildBlocking();
-        settings = new CommandSettings("!", jda, true); // default prefix shall be "!" and we want the labels to be case insensitive.
+        // default prefix shall be "!" and we want the labels to be case insensitive. With the last argument, commands can only be executed every 3 seconds.
+        settings = new CommandSettings("!", jda, true, 3000);
         settings.setHelpLabels("help", "helpme") // help can now be demanded by calling one of these labels.
                 .put(new PingCommand(), "ping")
                 .put(new PrefixCommand(settings), "setprefix")

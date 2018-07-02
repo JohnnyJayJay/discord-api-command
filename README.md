@@ -1,8 +1,8 @@
 # discord-api-command
 **A simple Command API for the JDA**
 
-*CURRENT VERSION: **3.0_2***<p>
-*Other versions: **3.0_1**, **3.0***
+*CURRENT VERSION: **3.0_3***<p>
+*Other versions: **3.0_2**, **3.0_1**, **3.0***
 
 ## Features:
 - easy command implementation
@@ -40,7 +40,7 @@ And that's it!
 Using the CommandAPI is quite easy. All you need to do is writing your own commands, the rest won't concern you.<p>
 Command classes have to implement the interface `ICommand`, which represents a class whose objects are able to execute commands.
 
-This interface contains two methods, `void onCommand(CommandEvent, Member, TextChannel, String[])` and `String info(Guild)`.
+This interface contains two methods, `void onCommand(CommandEvent, Member, TextChannel, String[])` and `String info(Member)`.
 The first method **must** be implemented. It will be called in case an object of this class is registered as a command executor and its label gets called by a member of a guild 
 the bot is on. So, an example implementation of `ICommand` might look like this:
 
@@ -55,7 +55,7 @@ public class PingCommand implements ICommand {
     
     // Optional
     @Override
-    public String info(Guild guild) {
+    public String info(Member member) {
         return "This command pongs you. Try it out!";
     }
 }
@@ -83,14 +83,15 @@ This person could also type `!pingpong` or `!p`. These are aliases.
 
 What if we wanted to use this help command? Then we only have to adjust one thing:
 ```java
-CommandSettings settings = new CommandSettings("!", jda, true); 
+CommandSettings settings = new CommandSettings("!", jda, true, 3000); // new: you can now set a command cooldown either here... 
 settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
         .put(new PingCommand(), "ping", "pingpong", "p")
         .activate();
+settings.setCooldown(2000); // Or here!
 ```
 
 If someone either calls `!help`, `!helpme` or `!h`, a list of all commands will be displayed along with the information that more help can be received by adding a command label 
-as the first argument (e.g. `!help ping`). In this case, the content of the method `info(Guild)` will be shown. If this method is not overwritten, it will show the default text 
+as the first argument (e.g. `!help ping`). In this case, the content of the method `info(Member)` will be shown. If this method is not overwritten, it will show the default text 
 which is "No info, description or help set for this command". If you think that this kind of help command is too basic or you dislike it for whatever reasons, just don't set any help 
 labels and it will not be used. You can still make your own help command implementation of course.
 

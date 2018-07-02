@@ -27,6 +27,7 @@ public class CommandSettings {
     private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
 
     private String defaultPrefix;
+    private long cooldown;
 
     private Set<String> helpLabels; // labels which trigger the auto-generated help command
     private Map<Long, String> prefixMap; // Long: GuildID, String: prefix
@@ -52,7 +53,7 @@ public class CommandSettings {
      *                       "FOO", "FoO" and so on.
      */
     public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean labelIgnoreCase) {
-        this(defaultPrefix, labelIgnoreCase);
+        this(defaultPrefix, labelIgnoreCase, 0);
         this.jda = shardManager;
         this.useShardManager = true;
     }
@@ -66,15 +67,48 @@ public class CommandSettings {
      *      *                 "FOO", "FoO" and so on.
      */
     public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean labelIgnoreCase) {
-        this(defaultPrefix, labelIgnoreCase);
+        this(defaultPrefix, labelIgnoreCase, 0);
         this.jda = jda;
         this.useShardManager = false;
     }
 
-    private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase) {
+    /**
+     * This is the optional constructor in case you are sharding your bot.
+     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
+     * @param shardManager Put your active ShardManager here. This is important for the activation of the CommandListener.
+     * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
+     * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
+     *                       "FOO", "FoO" and so on.
+     * @param msCooldown How much time it takes until a member is able to use a command again. This is to prevent spamming.
+     * @throws CommandSetException if the given prefix is invalid.
+     */
+    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean labelIgnoreCase, long msCooldown) {
+        this(defaultPrefix, labelIgnoreCase, msCooldown);
+        this.jda = shardManager;
+        this.useShardManager = true;
+    }
+
+    /**
+     * This is the constructor.
+     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
+     * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
+     * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
+     * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
+     *      *                 "FOO", "FoO" and so on.
+     * @param msCooldown How much time it takes until a member is able to use a command again. This is to prevent spamming.
+     * @throws CommandSetException if the given prefix is invalid.
+     */
+    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean labelIgnoreCase, long msCooldown) {
+        this(defaultPrefix, labelIgnoreCase, msCooldown);
+        this.jda = jda;
+        this.useShardManager = false;
+    }
+
+    private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase, long msCooldown) {
         this.commands = new HashMap<>();
         this.listener = new CommandListener(this);
         this.activated = false;
+        this.cooldown = msCooldown;
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
         this.helpLabels = new HashSet<>();
@@ -176,6 +210,14 @@ public class CommandSettings {
     }
 
     /**
+     * Sets the cooldown for these settings.
+     * @param msCooldown the cooldown
+     */
+    public void setCooldown(long msCooldown) {
+        this.cooldown = msCooldown;
+    }
+
+    /**
      * Sets the prefix and the command HashMap for the rest of the API. This is the last method to call when having finished setting up your commands.<p>
      * Note that activating multiple CommandSettings may cause problems. You can do this to use multiple prefixes, but it is not recommended.<p>
      * This method is important to call because otherwise no command will be registered by the internal command listener.
@@ -223,6 +265,10 @@ public class CommandSettings {
      */
     public String getPrefix() {
         return defaultPrefix;
+    }
+
+    protected long getCooldown() {
+        return cooldown;
     }
 
     protected boolean labelIgnoreCase() {

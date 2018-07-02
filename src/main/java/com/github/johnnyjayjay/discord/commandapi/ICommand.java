@@ -1,6 +1,5 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -28,7 +27,7 @@ public interface ICommand {
      * @return By default, this returns "No info, description or help set" which will be displayed if someone demands help for this command. An Override
      * should return info about the command, such as usage, description, permissions, aliases...
      */
-    default String info(Guild guild) {
+    default String info(Member member) {
         return "No info, description or help set for this command";
     }
 
