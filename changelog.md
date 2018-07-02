@@ -2,6 +2,7 @@
 
 ### 3.0_3
 - Changed parameters of info-method from Guild to Member
+- Added possibility to set command cooldown (either in the constructor of `CommandSettings` or in its setter)
 
 ### 3.0_2
 - Added permissions check before printing help messages
