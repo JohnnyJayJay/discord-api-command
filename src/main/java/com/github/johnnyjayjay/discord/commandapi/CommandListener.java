@@ -7,6 +7,9 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static java.lang.String.join;
 import static java.lang.String.format;
 
@@ -14,9 +17,11 @@ import static java.lang.String.format;
 class CommandListener extends ListenerAdapter {
 
     private CommandSettings settings;
+    private Map<Long, Long> cooldowns; // Long: User id, Long: last timestamp
 
     public CommandListener(CommandSettings settings) {
         this.settings = settings;
+        this.cooldowns = new HashMap<>();
     }
 
     @Override
@@ -25,6 +30,11 @@ class CommandListener extends ListenerAdapter {
         String prefix = settings.getPrefix(event.getGuild().getIdLong());
         if (!event.getAuthor().isBot()) {
             if (raw.startsWith(prefix)) {
+                long timestamp = System.currentTimeMillis();
+                long userId = event.getAuthor().getIdLong();
+                if (cooldowns.containsKey(userId) && (timestamp - cooldowns.get(userId)) < settings.getCooldown())
+                    return;
+                cooldowns.put(userId, timestamp);
                 CommandEvent.Command cmd = new CommandEvent.Command(raw, prefix, settings);
                 if (cmd.getExecutor() != null) {
                     cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),

@@ -28,7 +28,7 @@ public class KillCommand implements ICommand {
     }
 
     @Override
-    public String info(Guild guild) {
-        return String.format("Deactivates all commands. No return.\n\n ¯\\_(ツ)_/¯\n\nUsage: `%s[kill|deactivate|shutdown]`", settings.getPrefix(guild.getIdLong()));
+    public String info(Member member) {
+        return String.format("Deactivates all commands. No return.\n\n ¯\\_(ツ)_/¯\n\nUsage: `%s[kill|deactivate|shutdown]`", settings.getPrefix(member.getGuild().getIdLong()));
     }
 }

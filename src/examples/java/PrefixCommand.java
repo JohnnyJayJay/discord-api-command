@@ -32,7 +32,7 @@ public class PrefixCommand implements ICommand {
     }
 
     @Override
-    public String info(Guild guild) {
-        return String.format("Sets the prefix for the this guild.\nUsage: `%ssetprefix <prefix>`", settings.getPrefix(guild.getIdLong()));
+    public String info(Member member) {
+        return String.format("Sets the prefix for the this guild.\nUsage: `%ssetprefix <prefix>`", settings.getPrefix(member.getGuild().getIdLong()));
     }
 }

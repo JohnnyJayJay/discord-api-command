@@ -31,7 +31,7 @@ public class PingCommand implements ICommand {
     }
 
     @Override
-    public String info(Guild guild) {
-        return String.format("Tag another member to pong him. Or let it be and get the bot's ping.\nUsage: `%sping <member>`", Main.getPrefix(guild.getIdLong()));
+    public String info(Member member) {
+        return String.format("Tag another member to pong him. Or let it be and get the bot's ping.\nUsage: `%sping <member>`", Main.getPrefix(member.getGuild().getIdLong()));
     }
 }
