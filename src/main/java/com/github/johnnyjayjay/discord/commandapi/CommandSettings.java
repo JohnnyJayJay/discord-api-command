@@ -213,8 +213,9 @@ public class CommandSettings {
      * Sets the cooldown for these settings.
      * @param msCooldown the cooldown
      */
-    public void setCooldown(long msCooldown) {
+    public CommandSettings setCooldown(long msCooldown) {
         this.cooldown = msCooldown;
+        return this;
     }
 
     /**
