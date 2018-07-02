@@ -210,6 +210,14 @@ public class CommandSettings {
     }
 
     /**
+     * Sets the cooldown for these settings.
+     * @param msCooldown the cooldown
+     */
+    public void setCooldown(long msCooldown) {
+        this.cooldown = msCooldown;
+    }
+
+    /**
      * Sets the prefix and the command HashMap for the rest of the API. This is the last method to call when having finished setting up your commands.<p>
      * Note that activating multiple CommandSettings may cause problems. You can do this to use multiple prefixes, but it is not recommended.<p>
      * This method is important to call because otherwise no command will be registered by the internal command listener.
