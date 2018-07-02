@@ -4,10 +4,8 @@ import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * To use this API, create a new object of this class and add your command classes by using add(...)<p>
@@ -120,13 +118,31 @@ public class CommandSettings {
      * @param labels One or more labels which may later be called by members to list all commands or to show info about one specific command.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings setHelpLabels(@Nonnull String... labels) {
+    public CommandSettings addHelpLabels(@Nonnull String... labels) {
         for (String label : labels) {
             if (label.matches(VALID_LABEL))
                 helpLabels.add(label);
             else
                 throw new CommandSetException(INVALID_LABEL_MESSAGE);
         }
+        return this;
+    }
+
+    /**
+     * This can be used to remove some help labels, but not all of them.
+     * @param labels The help labels to remove.
+     * @return The current object. This is to use fluent interface.
+     */
+    public boolean removeHelpLabels(String... labels) {
+        return helpLabels.removeAll(Arrays.asList(labels));
+    }
+
+    /**
+     * This can be used to deactivate the help labels. Removes every help label.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings clearHelpLabels() {
+        helpLabels.removeAll(helpLabels);
         return this;
     }
 
@@ -203,7 +219,7 @@ public class CommandSettings {
      * @param prefix The prefix to be set.
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
-    public void setCustomPrefix(long guildId, @Nonnull String prefix) {
+    public void setCustomPrefix(long guildId, @Nullable String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
             throw new CommandSetException(INVALID_PREFIX_MESSAGE);
         prefixMap.put(guildId, prefix);
