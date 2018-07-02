@@ -2,6 +2,7 @@ package com.github.johnnyjayjay.discord.commandapi;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -29,13 +30,13 @@ class CommandListener extends ListenerAdapter {
                     cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
                             event.getMember(), event.getChannel(), cmd.getArgs());
                 } else if (settings.getHelpLabels().contains(cmd.getLabel()) && event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
-                    this.sendInfo(event.getChannel(), prefix, cmd.getArgs());
+                    this.sendInfo(event.getMember(), event.getChannel(), prefix, cmd.getArgs());
                 }
             }
         }
     }
 
-    private void sendInfo(TextChannel channel, String prefix, String[] args) {
+    private void sendInfo(Member member, TextChannel channel, String prefix, String[] args) {
         var builder = new EmbedBuilder().setTitle("Help");
         if (args.length == 0) {
             String helpLabels = format("[%s]", join("|", settings.getHelpLabels().toArray(new String[settings.getHelpLabels().size()])));
@@ -46,7 +47,7 @@ class CommandListener extends ListenerAdapter {
             channel.sendMessage(builder.build()).queue();
         } else if (args.length == 1 && settings.getCommands().containsKey(args[0])) {
             builder.appendDescription(format("**Command Info for:** `%s`\n\n", args[0]))
-                    .appendDescription(settings.getCommands().get(args[0]).info(channel.getGuild()));
+                    .appendDescription(settings.getCommands().get(args[0]).info(member));
             channel.sendMessage(builder.build()).queue();
         }
     }
