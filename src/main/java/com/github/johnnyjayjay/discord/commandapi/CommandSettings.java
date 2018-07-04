@@ -200,6 +200,10 @@ public class CommandSettings {
         return success;
     }
 
+    public void clear() {
+        commands.entrySet().forEach(commands::remove);
+    }
+
     /**
      * Use this method to set the default prefix.
      * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.

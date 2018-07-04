@@ -1,5 +1,13 @@
 # Changelog
 
+### 3.0_4
+- Changed setCooldown-method's return to `this`
+- Added possibility to change help labels (by clearing them or removing specific ones)
+- Added possibility to clear all commands
+- Changed the split regex for arguments from " " to "\\s+" (it doesn't matter how many spaces there are now)
+- Changed the help command listing type
+- Added some possibly-helpful  methods to class `Command`
+
 ### 3.0_3
 - Changed parameters of info-method from Guild to Member
 - Added possibility to set command cooldown (either in the constructor of `CommandSettings` or in its setter)

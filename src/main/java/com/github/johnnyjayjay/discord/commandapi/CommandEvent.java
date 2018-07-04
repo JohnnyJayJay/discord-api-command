@@ -25,6 +25,10 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         return command;
     }
 
+    public String[] getArgs() {
+        return command.args;
+    }
+
     /**
      * Describes an executed Command. <p>
      * Is used to parse a message which seems to be a command.
@@ -38,7 +42,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         private String[] args;
 
         Command(String raw, String prefix, CommandSettings settings) {
-            String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split(" ");
+            String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
             String commandLabel = settings.labelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];
             List<String> argList = Arrays.asList(argsWithoutPrefix);
             String[] args = argList.subList(1, argList.size()).toArray(new String[argList.size() - 1]);
@@ -68,6 +72,30 @@ public class CommandEvent extends GuildMessageReceivedEvent {
          */
         public ICommand getExecutor() {
             return command;
+        }
+
+        /**
+         * @return the arguments as an immutable List
+         */
+        public List<String> getArgsAsList() {
+            return List.of(args);
+        }
+
+        /**
+         * @return the arguments joined with a space
+         */
+        public String getArgsAsString() {
+            return String.join(" ", args);
+        }
+
+        /**
+         * @param fromIndex from which argument index the Strings will be joined.
+         * @return the arguments joined with a space
+         */
+        public String getArgsAsString(int fromIndex) {
+            if (fromIndex >= args.length)
+                throw new IllegalArgumentException("invalid index! The arguments array only has a total length of " + args.length);
+            return String.join(" ", Arrays.asList(args).subList(fromIndex, args.length));
         }
     }
 }
