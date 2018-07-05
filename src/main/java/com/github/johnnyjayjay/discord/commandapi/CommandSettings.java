@@ -2,10 +2,17 @@ package com.github.johnnyjayjay.discord.commandapi;
 
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * To use this API, create a new object of this class and add your command classes by using add(...)<p>
@@ -16,10 +23,13 @@ import java.util.*;
 
 public class CommandSettings {
 
-    // Regex which only matches valid prefixes
+    // Logger
+    public static final Logger logger = LoggerFactory.getLogger("CommandAPI");
+
+    // Regex that only matches valid prefixes
     public static final String VALID_PREFIX = "([^\\\\+*^|$?])+";
-    // Regex which only matches valid command labels
-    public static final String VALID_LABEL = "([^\\s\\n\\t])+";
+    // Regex that only matches valid command labels
+    public static final String VALID_LABEL = "([^\\s])+";
 
     private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
     private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
@@ -32,7 +42,7 @@ public class CommandSettings {
 
     private Map<String, ICommand> commands; // String: command label, ICommand: command class
 
-    private Object jda;
+    private Object jda; // The JDA or ShardManager
 
     private CommandListener listener;
 
@@ -114,27 +124,63 @@ public class CommandSettings {
     }
 
     /**
+     * Method to add one help label.
+     * @param label The label to add.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if the given label is invalid (contains spaces)
+     */
+    public CommandSettings addHelpLabel(String label) {
+        if (label.matches(VALID_LABEL))
+            helpLabels.add(labelIgnoreCase ? label.toLowerCase() : label);
+        else
+            throw new CommandSetException(INVALID_LABEL_MESSAGE);
+
+        return this;
+    }
+
+    /**
      * Use this method to add help labels. This will only work if you instantiated this class with the parameter useHelpCommand as true.
      * @param labels One or more labels which may later be called by members to list all commands or to show info about one specific command.
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings addHelpLabels(@Nonnull String... labels) {
-        for (String label : labels) {
-            if (label.matches(VALID_LABEL))
-                helpLabels.add(label);
-            else
-                throw new CommandSetException(INVALID_LABEL_MESSAGE);
-        }
+        for (String label : labels)
+            this.addHelpLabel(label);
+
+        return this;
+    }
+
+    /**
+     * Adds multiple labels from a String Set.
+     * @param labels A Set which contains the labels you want to add.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings addHelpLabels(Set<String> labels) {
+        var labelStream = labels.stream();
+        if (labelStream.allMatch((label) -> label.matches(VALID_LABEL)))
+            helpLabels.addAll(labelIgnoreCase ? labelStream.map(String::toLowerCase).collect(Collectors.toSet()) : labels);
+        else
+            throw new CommandSetException(INVALID_LABEL_MESSAGE);
+
         return this;
     }
 
     /**
      * This can be used to remove some help labels, but not all of them.
      * @param labels The help labels to remove.
-     * @return The current object. This is to use fluent interface.
+     * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
     public boolean removeHelpLabels(String... labels) {
-        return helpLabels.removeAll(Arrays.asList(labels));
+        return helpLabels.removeAll(Set.of(labels));
+    }
+
+    /**
+     * Removes all labels from a Set.
+     * @param labels The Set of labels that are to be removed.
+     * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
+     */
+    public boolean removeHelpLabels(Set<String> labels) {
+        return helpLabels.removeAll(labels);
     }
 
     /**
@@ -142,7 +188,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clearHelpLabels() {
-        helpLabels.removeAll(helpLabels);
+        helpLabels.clear();
         return this;
     }
 
@@ -200,8 +246,21 @@ public class CommandSettings {
         return success;
     }
 
-    public void clear() {
-        commands.entrySet().forEach(commands::remove);
+    /**
+     * Removes every label that is in the given Collection.
+     * @param labels The labels to remove.
+     * @return true, if every label was successfully removed. False, if not (e.g. the label didn't exist)
+     */
+    public boolean remove(Set<String> labels) {
+        return this.remove(labels.toArray(new String[labels.size()]));
+    }
+
+    /**
+     * Removes each entry from the commands map. After that, only the help commands are still registered.
+     */
+    public CommandSettings clear() {
+        commands.clear();
+        return this;
     }
 
     /**
@@ -220,7 +279,7 @@ public class CommandSettings {
      * Use this method to add a custom command prefix to a guild. This will only work if you instantiated this class with useCustomPrefixes set to true.
      * You can remove the custom prefix from a guild by setting its prefix to null.
      * @param guildId The guild id as a long.
-     * @param prefix The prefix to be set.
+     * @param prefix The nullable prefix to be set.
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
     public void setCustomPrefix(long guildId, @Nullable String prefix) {
@@ -230,8 +289,8 @@ public class CommandSettings {
     }
 
     /**
-     * Sets the cooldown for these settings.
-     * @param msCooldown the cooldown
+     * Sets the cooldown for this instance of settings.
+     * @param msCooldown the cooldown in milliseconds.
      */
     public CommandSettings setCooldown(long msCooldown) {
         this.cooldown = msCooldown;
@@ -286,6 +345,31 @@ public class CommandSettings {
      */
     public String getPrefix() {
         return defaultPrefix;
+    }
+
+    /**
+     * Returns every registered label in a Set. Note that in case you activated labelIgnoreCase, every label in there will be in lower case.
+     * Adding or removing something will not have any effect. This can primarily be used to iterate over the labels.
+     * @return a Set of labels.
+     */
+    public Set<String> getLabelSet() {
+        return commands.keySet();
+    }
+
+    /**
+     * Returns all of the registered help labels.
+     * @return an unmodifiable Set of Strings that are registered as help labels.
+     */
+    public Set<String> getHelpLabelSet() {
+        return Collections.unmodifiableSet(helpLabels);
+    }
+
+    /**
+     * Returns whether this instance is activated or not.
+     * @return true, if it is, false, if not.
+     */
+    public boolean isActivated() {
+        return activated;
     }
 
     protected long getCooldown() {

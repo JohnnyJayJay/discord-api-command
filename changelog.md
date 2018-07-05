@@ -1,12 +1,17 @@
 # Changelog
 
-### 3.0_4
+### 3.1
 - Changed setCooldown-method's return to `this`
 - Added possibility to change help labels (by clearing them or removing specific ones)
 - Added possibility to clear all commands
+- Added methods to remove Sets of labels from the commands
+- Added public Getters for the registered labels, help labels and the boolean `activated`
+- Added first steps for **logging**
 - Changed the split regex for arguments from " " to "\\s+" (it doesn't matter how many spaces there are now)
 - Changed the help command listing type
 - Added some possibly-helpful  methods to class `Command`
+- Fixed an issue where help labels ignored whether you would activate `labelIgnoreCase`
+- Cleaned some code
 
 ### 3.0_3
 - Changed parameters of info-method from Guild to Member
