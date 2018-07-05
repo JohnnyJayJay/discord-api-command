@@ -154,15 +154,20 @@ public class CommandSettings {
      * Adds multiple labels from a String Set.
      * @param labels A Set which contains the labels you want to add.
      * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if one of the labels is not a valid label.
      */
-    public CommandSettings addHelpLabels(Set<String> labels) {
-        var labelStream = labels.stream();
-        if (labelStream.allMatch((label) -> label.matches(VALID_LABEL)))
-            helpLabels.addAll(labelIgnoreCase ? labelStream.map(String::toLowerCase).collect(Collectors.toSet()) : labels);
-        else
-            throw new CommandSetException(INVALID_LABEL_MESSAGE);
-
+    public CommandSettings addHelpLabels(@Nonnull Set<String> labels) {
+        this.addHelpLabels(labels.toArray(new String[labels.size()]));
         return this;
+    }
+
+    /**
+     * This method removes one specific help label from the help label Set.
+     * @param label The label to remove.
+     * @return true, if the label was successfully removed. False, if not.
+     */
+    public boolean removeHelpLabel(String label) {
+        return helpLabels.remove(label);
     }
 
     /**
@@ -170,7 +175,7 @@ public class CommandSettings {
      * @param labels The help labels to remove.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
-    public boolean removeHelpLabels(String... labels) {
+    public boolean removeHelpLabels(@Nonnull String... labels) {
         return helpLabels.removeAll(Set.of(labels));
     }
 
@@ -179,7 +184,7 @@ public class CommandSettings {
      * @param labels The Set of labels that are to be removed.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
-    public boolean removeHelpLabels(Set<String> labels) {
+    public boolean removeHelpLabels(@Nonnull Set<String> labels) {
         return helpLabels.removeAll(labels);
     }
 
@@ -201,7 +206,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException If the label is empty or consists of multiple words.
      */
-    public CommandSettings put(@Nonnull ICommand executor, @Nonnull String label) {
+    public CommandSettings put(@Nonnull ICommand executor, String label) {
         if (label.matches(VALID_LABEL))
             commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
@@ -216,6 +221,7 @@ public class CommandSettings {
      * @param executor An instance of your command class which implements ICommand.
      * @param labels One or more labels. This will throw a CommandSetException, if the label is empty or contains spaces.
      * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException If one label is empty or consists of multiple words
      */
     public CommandSettings put(@Nonnull ICommand executor, @Nonnull String... labels) {
         for (String label : labels)
@@ -224,11 +230,23 @@ public class CommandSettings {
     }
 
     /**
+     * Use this method to add commands with aliases from a Set. This is not much different from the put-method with Varargs.
+     * @param executor An instance of your command class which implements ICommand.
+     * @param labels One or more labels. This will throw a CommandSetException, if the label is empty or contains spaces.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if one label is empty or contains spaces.
+     */
+    public CommandSettings put(@Nonnull ICommand executor, @Nonnull Set<String> labels) {
+        this.put(executor, labels.toArray(new String[labels.size()]));
+        return this;
+    }
+
+    /**
      * Use this method to remove existing commands. <p>
      * @param label The label of the command to remove.
      * @return true, if the label was successfully removed. false, if the given label doesn't exist.
      */
-    public boolean remove(@Nonnull String label) {
+    public boolean remove(String label) {
         return commands.remove(labelIgnoreCase ? label.toLowerCase() : label) != null;
     }
 
@@ -251,7 +269,7 @@ public class CommandSettings {
      * @param labels The labels to remove.
      * @return true, if every label was successfully removed. False, if not (e.g. the label didn't exist)
      */
-    public boolean remove(Set<String> labels) {
+    public boolean remove(@Nonnull Set<String> labels) {
         return this.remove(labels.toArray(new String[labels.size()]));
     }
 
