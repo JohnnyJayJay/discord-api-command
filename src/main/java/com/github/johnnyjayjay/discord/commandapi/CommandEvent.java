@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command.
  * @author Johnny_JayJay
- * @version 3.0
+ * @version 3.1
  */
 public class CommandEvent extends GuildMessageReceivedEvent {
 
