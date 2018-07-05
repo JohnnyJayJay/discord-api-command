@@ -5,6 +5,7 @@
 - Added possibility to change help labels (by clearing them or removing specific ones)
 - Added possibility to clear all commands
 - Added methods to remove Sets of labels from the commands
+- Added methods to add Sets of labels to the commands
 - Added public Getters for the registered labels, help labels and the boolean `activated`
 - Added first steps for **logging**
 - Changed the split regex for arguments from " " to "\\s+" (it doesn't matter how many spaces there are now)
