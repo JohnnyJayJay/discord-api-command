@@ -83,11 +83,11 @@ This person could also type `!pingpong` or `!p`. These are aliases.
 
 What if we wanted to use this help command? Then we only have to adjust one thing:
 ```java
-CommandSettings settings = new CommandSettings("!", jda, true, 3000); // new: you can now set a command cooldown either here... 
-settings.setHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
+CommandSettings settings = new CommandSettings("!", jda, true);  
+settings.setCooldown(3000) // new: you can now set a command cooldown (here: 3 seconds)
+        .setHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
         .put(new PingCommand(), "ping", "pingpong", "p")
         .activate();
-settings.setCooldown(2000); // Or here!
 ```
 
 If someone either calls `!help`, `!helpme` or `!h`, a list of all commands will be displayed along with the information that more help can be received by adding a command label 
