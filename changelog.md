@@ -11,8 +11,9 @@
 - Changed the split regex for arguments from " " to "\\s+" (it doesn't matter how many spaces there are now)
 - Changed the help command listing type
 - Added some possibly-helpful  methods to class `Command`
+- Added channel blacklist
 - Fixed an issue where help labels ignored whether you would activate `labelIgnoreCase`
-- Cleaned some code
+- Cleaned some code and fixed some minor bugs
 
 ### 3.0_3
 - Changed parameters of info-method from Guild to Member

@@ -7,11 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,9 +23,9 @@ public class CommandSettings {
     public static final Logger logger = LoggerFactory.getLogger("CommandAPI");
 
     // Regex that only matches valid prefixes
-    public static final String VALID_PREFIX = "([^\\\\+*^|$?])+";
+    public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
     // Regex that only matches valid command labels
-    public static final String VALID_LABEL = "([^\\s])+";
+    public static final String VALID_LABEL = "[^\\s]+";
 
     private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
     private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
@@ -37,6 +33,7 @@ public class CommandSettings {
     private String defaultPrefix;
     private long cooldown;
 
+    private Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
     private Set<String> helpLabels; // labels which trigger the auto-generated help command
     private Map<Long, String> prefixMap; // Long: GuildID, String: prefix
 
@@ -50,6 +47,7 @@ public class CommandSettings {
     private boolean useShardManager;
 
     private boolean labelIgnoreCase;
+    private boolean botExecution;
 
 
     /**
@@ -61,7 +59,7 @@ public class CommandSettings {
      *                       "FOO", "FoO" and so on.
      */
     public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean labelIgnoreCase) {
-        this(defaultPrefix, labelIgnoreCase, 0);
+        this(defaultPrefix, labelIgnoreCase);
         this.jda = shardManager;
         this.useShardManager = true;
     }
@@ -75,48 +73,17 @@ public class CommandSettings {
      *      *                 "FOO", "FoO" and so on.
      */
     public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean labelIgnoreCase) {
-        this(defaultPrefix, labelIgnoreCase, 0);
+        this(defaultPrefix, labelIgnoreCase);
         this.jda = jda;
         this.useShardManager = false;
     }
 
-    /**
-     * This is the optional constructor in case you are sharding your bot.
-     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
-     * @param shardManager Put your active ShardManager here. This is important for the activation of the CommandListener.
-     * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
-     * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
-     *                       "FOO", "FoO" and so on.
-     * @param msCooldown How much time it takes until a member is able to use a command again. This is to prevent spamming.
-     * @throws CommandSetException if the given prefix is invalid.
-     */
-    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull ShardManager shardManager, boolean labelIgnoreCase, long msCooldown) {
-        this(defaultPrefix, labelIgnoreCase, msCooldown);
-        this.jda = shardManager;
-        this.useShardManager = true;
-    }
-
-    /**
-     * This is the constructor.
-     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
-     * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
-     * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
-     * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
-     *      *                 "FOO", "FoO" and so on.
-     * @param msCooldown How much time it takes until a member is able to use a command again. This is to prevent spamming.
-     * @throws CommandSetException if the given prefix is invalid.
-     */
-    public CommandSettings(@Nonnull String defaultPrefix, @Nonnull JDA jda, boolean labelIgnoreCase, long msCooldown) {
-        this(defaultPrefix, labelIgnoreCase, msCooldown);
-        this.jda = jda;
-        this.useShardManager = false;
-    }
-
-    private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase, long msCooldown) {
+    private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase) {
         this.commands = new HashMap<>();
         this.listener = new CommandListener(this);
         this.activated = false;
-        this.cooldown = msCooldown;
+        this.cooldown = 0;
+        this.botExecution = false;
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
         this.helpLabels = new HashSet<>();
@@ -131,7 +98,7 @@ public class CommandSettings {
      */
     public CommandSettings addHelpLabel(String label) {
         if (label.matches(VALID_LABEL))
-            helpLabels.add(labelIgnoreCase ? label.toLowerCase() : label);
+            this.helpLabels.add(labelIgnoreCase ? label.toLowerCase() : label);
         else
             throw new CommandSetException(INVALID_LABEL_MESSAGE);
 
@@ -146,7 +113,6 @@ public class CommandSettings {
     public CommandSettings addHelpLabels(@Nonnull String... labels) {
         for (String label : labels)
             this.addHelpLabel(label);
-
         return this;
     }
 
@@ -156,8 +122,8 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if one of the labels is not a valid label.
      */
-    public CommandSettings addHelpLabels(@Nonnull Set<String> labels) {
-        this.addHelpLabels(labels.toArray(new String[labels.size()]));
+    public CommandSettings addHelpLabels(@Nonnull Collection<String> labels) {
+        this.helpLabels.addAll(labelIgnoreCase ? labels.stream().map(String::toLowerCase).collect(Collectors.toList()) : labels);
         return this;
     }
 
@@ -167,7 +133,7 @@ public class CommandSettings {
      * @return true, if the label was successfully removed. False, if not.
      */
     public boolean removeHelpLabel(String label) {
-        return helpLabels.remove(label);
+        return this.helpLabels.remove(labelIgnoreCase ? label.toLowerCase() : label);
     }
 
     /**
@@ -176,7 +142,13 @@ public class CommandSettings {
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
     public boolean removeHelpLabels(@Nonnull String... labels) {
-        return helpLabels.removeAll(Set.of(labels));
+        boolean success = true;
+        for (String label : labels) {
+            if (!this.removeHelpLabel(label)) {
+                success = false;
+            }
+        }
+        return success;
     }
 
     /**
@@ -184,8 +156,8 @@ public class CommandSettings {
      * @param labels The Set of labels that are to be removed.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
-    public boolean removeHelpLabels(@Nonnull Set<String> labels) {
-        return helpLabels.removeAll(labels);
+    public boolean removeHelpLabels(@Nonnull Collection<String> labels) {
+        return this.helpLabels.removeAll(labelIgnoreCase ? labels.stream().map(String::toLowerCase).collect(Collectors.toList()) : labels);
     }
 
     /**
@@ -193,7 +165,80 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clearHelpLabels() {
-        helpLabels.clear();
+        this.helpLabels.clear();
+        return this;
+    }
+
+    /**
+     * Adds a given channel to the blacklist (meaning commands can not be executed in there).
+     * @param channelId the id of the channel to be blacklisted.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings addChannelToBlacklist(long channelId) {
+        this.blacklistedChannels.add(channelId);
+        return this;
+    }
+
+    /**
+     * Adds multiple channels to the blacklist.
+     * @param channelIds multiple ids or an array of ids to be added.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings addChannelsToBlacklist(long... channelIds) {
+        for (long id : channelIds)
+            this.addChannelToBlacklist(id);
+        return this;
+    }
+
+    /**
+     * Adds multiple channels to the blacklist.
+     * @param channelIds A Collection of channel ids to be added.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings addChannelsToBlacklist(Collection<Long> channelIds) {
+        this.blacklistedChannels.addAll(channelIds);
+        return this;
+    }
+
+    /**
+     * Removes one channel from the blacklist.
+     * @param channelId the id of the channel to remove.
+     * @return true, if this was successful, false, if not.
+     */
+    public boolean removeChannelFromBlacklist(long channelId) {
+        return this.blacklistedChannels.remove(channelId);
+    }
+
+    /**
+     * Removes one or more channels from the blacklist.
+     * @param channelIds The ids of the channels to remove.
+     * @return true, if this was successful, false, if not.
+     */
+    public boolean removeChannelsFromBlacklist(long... channelIds) {
+        boolean success = true;
+        for (long id : channelIds) {
+            if (!this.removeChannelFromBlacklist(id)) {
+                success = false;
+            }
+        }
+        return success;
+    }
+
+    /**
+     * Removes a given Collection of channel ids from the blacklist.
+     * @param channelIds the Collection to remove.
+     * @return true, if this was successful, false, if not.
+     */
+    public boolean removeChannelsFromBlackList(Collection<Long> channelIds) {
+        return this.blacklistedChannels.removeAll(channelIds);
+    }
+
+    /**
+     * Clears the blacklist so that no channel is blacklisted anymore.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings clearBlacklist() {
+        this.blacklistedChannels.clear();
         return this;
     }
 
@@ -208,7 +253,7 @@ public class CommandSettings {
      */
     public CommandSettings put(@Nonnull ICommand executor, String label) {
         if (label.matches(VALID_LABEL))
-            commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
+            this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
             throw new CommandSetException(INVALID_LABEL_MESSAGE);
 
@@ -236,7 +281,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if one label is empty or contains spaces.
      */
-    public CommandSettings put(@Nonnull ICommand executor, @Nonnull Set<String> labels) {
+    public CommandSettings put(@Nonnull ICommand executor, @Nonnull Collection<String> labels) {
         this.put(executor, labels.toArray(new String[labels.size()]));
         return this;
     }
@@ -247,7 +292,7 @@ public class CommandSettings {
      * @return true, if the label was successfully removed. false, if the given label doesn't exist.
      */
     public boolean remove(String label) {
-        return commands.remove(labelIgnoreCase ? label.toLowerCase() : label) != null;
+        return this.commands.remove(labelIgnoreCase ? label.toLowerCase() : label) != null;
     }
 
     /**
@@ -269,15 +314,30 @@ public class CommandSettings {
      * @param labels The labels to remove.
      * @return true, if every label was successfully removed. False, if not (e.g. the label didn't exist)
      */
-    public boolean remove(@Nonnull Set<String> labels) {
+    public boolean remove(@Nonnull Collection<String> labels) {
         return this.remove(labels.toArray(new String[labels.size()]));
     }
 
     /**
-     * Removes each entry from the commands map. After that, only the help commands are still registered.
+     * Clears all commands.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings clearCommands() {
+        this.commands.clear();
+        return this;
+    }
+
+    /**
+     * Resets this whole instance by clearing the commands, help labels and setting everything to how it was at the beginning.
+     * This instance will also be deactivated if it is not already.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clear() {
-        commands.clear();
+        this.clearBlacklist().clearCommands().clearHelpLabels();
+        this.botExecution = false;
+        this.cooldown = 0;
+        if (this.activated)
+            this.deactivate();
         return this;
     }
 
@@ -303,15 +363,26 @@ public class CommandSettings {
     public void setCustomPrefix(long guildId, @Nullable String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
             throw new CommandSetException(INVALID_PREFIX_MESSAGE);
-        prefixMap.put(guildId, prefix);
+        this.prefixMap.put(guildId, prefix);
     }
 
     /**
-     * Sets the cooldown for this instance of settings.
+     * Sets the cooldown for this instance of settings. If someone executes a command before the cooldown has expired, it won't be called.
      * @param msCooldown the cooldown in milliseconds.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings setCooldown(long msCooldown) {
         this.cooldown = msCooldown;
+        return this;
+    }
+
+    /**
+     * Setter for the field botExecution. Decides whether bots may execute commands. By default, this is NOT the case.
+     * @param botExecution true, if you want to allow bots to execute commands. false, if not.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings setBotExecution(boolean botExecution) {
+        this.botExecution = botExecution;
         return this;
     }
 
@@ -322,12 +393,12 @@ public class CommandSettings {
      * @throws CommandSetException if you already activated this instance.
      */
     public void activate() {
-        if (!activated) {
+        if (!this.activated) {
             if (useShardManager)
                 ((ShardManager)jda).addEventListener(listener);
             else
                 ((JDA)jda).addEventListener(listener);
-            activated = true;
+            this.activated = true;
         } else
             throw new CommandSetException("CommandSettings already activated!");
     }
@@ -338,12 +409,12 @@ public class CommandSettings {
      * @throws CommandSetException if you either did not activate this instance or already deactivated it.
      */
     public void deactivate() {
-        if (activated) {
+        if (this.activated) {
             if (useShardManager)
                 ((ShardManager)jda).removeEventListener(listener);
             else
                 ((JDA)jda).removeEventListener(listener);
-            activated = false;
+            this.activated = false;
         } else
             throw new CommandSetException("CommandSettings weren't activated yet and can therefore not be deactivated!");
     }
@@ -354,7 +425,7 @@ public class CommandSettings {
      * @return the default prefix, if there is no custom prefix set for the given guild id. Otherwise, it returns the custom prefix.
      */
     public String getPrefix(long guildId) {
-        return prefixMap.get(guildId) != null ? prefixMap.get(guildId) : defaultPrefix;
+        return this.prefixMap.get(guildId) != null ? prefixMap.get(guildId) : defaultPrefix;
     }
 
     /**
@@ -362,7 +433,15 @@ public class CommandSettings {
      * @return default prefix set in the constructor or the method setDefaultPrefix(String).
      */
     public String getPrefix() {
-        return defaultPrefix;
+        return this.defaultPrefix;
+    }
+
+    /**
+     * Use this to get the blacklisted channels.
+     * @return an unmodifiable Set with all blacklisted channels.
+     */
+    public Set<Long> getBlacklistedChannels() {
+        return Collections.unmodifiableSet(this.blacklistedChannels);
     }
 
     /**
@@ -371,7 +450,7 @@ public class CommandSettings {
      * @return a Set of labels.
      */
     public Set<String> getLabelSet() {
-        return commands.keySet();
+        return Collections.unmodifiableSet(this.commands.keySet());
     }
 
     /**
@@ -379,7 +458,7 @@ public class CommandSettings {
      * @return an unmodifiable Set of Strings that are registered as help labels.
      */
     public Set<String> getHelpLabelSet() {
-        return Collections.unmodifiableSet(helpLabels);
+        return Collections.unmodifiableSet(this.helpLabels);
     }
 
     /**
@@ -387,23 +466,27 @@ public class CommandSettings {
      * @return true, if it is, false, if not.
      */
     public boolean isActivated() {
-        return activated;
+        return this.activated;
     }
 
     protected long getCooldown() {
-        return cooldown;
+        return this.cooldown;
     }
 
     protected boolean labelIgnoreCase() {
-        return labelIgnoreCase;
+        return this.labelIgnoreCase;
+    }
+
+    protected boolean botsMayExecute() {
+        return this.botExecution;
     }
 
     protected Set<String> getHelpLabels() {
-        return helpLabels;
+        return this.helpLabels;
     }
 
     protected Map<String, ICommand> getCommands() {
-        return commands;
+        return this.commands;
     }
 
 }
