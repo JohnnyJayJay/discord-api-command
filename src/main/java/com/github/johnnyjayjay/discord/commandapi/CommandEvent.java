@@ -5,12 +5,13 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command.
  * @author Johnny_JayJay
- * @version 3.0
+ * @version 3.1
  */
 public class CommandEvent extends GuildMessageReceivedEvent {
 
@@ -23,6 +24,10 @@ public class CommandEvent extends GuildMessageReceivedEvent {
 
     public Command getCommand() {
         return command;
+    }
+
+    public String[] getArgs() {
+        return command.args;
     }
 
     /**
@@ -38,7 +43,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         private String[] args;
 
         Command(String raw, String prefix, CommandSettings settings) {
-            String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split(" ");
+            String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
             String commandLabel = settings.labelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];
             List<String> argList = Arrays.asList(argsWithoutPrefix);
             String[] args = argList.subList(1, argList.size()).toArray(new String[argList.size() - 1]);
@@ -68,6 +73,31 @@ public class CommandEvent extends GuildMessageReceivedEvent {
          */
         public ICommand getExecutor() {
             return command;
+        }
+
+        /**
+         * @return the arguments as an immutable List
+         */
+        public List<String> getArgsAsList() {
+            return Collections.unmodifiableList(Arrays.asList(args));
+        }
+
+        /**
+         * @return the arguments joined with a space
+         */
+        public String getJoinedArgs() {
+            return String.join(" ", args);
+        }
+
+        /**
+         * @param fromIndex from which argument index the Strings will be joined.
+         * @return the arguments joined with a space
+         * @throws IllegalArgumentException if the given index is invalid (higher than the argument length or lower than 0.
+         */
+        public String getJoinedArgs(int fromIndex) {
+            if (fromIndex >= args.length || fromIndex < 0)
+                throw new IllegalArgumentException("invalid index! The arguments array only has a total length of " + args.length);
+            return String.join(" ", Arrays.asList(args).subList(fromIndex, args.length));
         }
     }
 }
