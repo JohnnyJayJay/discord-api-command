@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.awt.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public class CommandSettings {
 
     private String defaultPrefix;
     private long cooldown;
+    private Color helpColor;
 
     private Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
     private Set<String> helpLabels; // labels which trigger the auto-generated help command
@@ -83,9 +85,11 @@ public class CommandSettings {
         this.listener = new CommandListener(this);
         this.activated = false;
         this.cooldown = 0;
+        this.helpColor = Color.LIGHT_GRAY;
         this.botExecution = false;
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
+        this.blacklistedChannels = new HashSet<>();
         this.helpLabels = new HashSet<>();
         this.prefixMap = new HashMap<>();
     }
@@ -387,6 +391,16 @@ public class CommandSettings {
     }
 
     /**
+     * Sets the color the help message embed will have. By default, it is Color.LIGHT_GRAY.
+     * @param color The color to set.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings setHelpCommandColor(Color color) {
+        this.helpColor = color;
+        return this;
+    }
+
+    /**
      * Sets the prefix and the command HashMap for the rest of the API. This is the last method to call when having finished setting up your commands.<p>
      * Note that activating multiple CommandSettings may cause problems. You can do this to use multiple prefixes, but it is not recommended.<p>
      * This method is important to call because otherwise no command will be registered by the internal command listener.
@@ -489,4 +503,7 @@ public class CommandSettings {
         return this.commands;
     }
 
+    protected Color getHelpColor() {
+        return this.helpColor;
+    }
 }

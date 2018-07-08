@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,22 +79,23 @@ public class CommandEvent extends GuildMessageReceivedEvent {
          * @return the arguments as an immutable List
          */
         public List<String> getArgsAsList() {
-            return List.of(args);
+            return Collections.unmodifiableList(Arrays.asList(args));
         }
 
         /**
          * @return the arguments joined with a space
          */
-        public String getArgsAsString() {
+        public String getJoinedArgs() {
             return String.join(" ", args);
         }
 
         /**
          * @param fromIndex from which argument index the Strings will be joined.
          * @return the arguments joined with a space
+         * @throws IllegalArgumentException if the given index is invalid (higher than the argument length or lower than 0.
          */
-        public String getArgsAsString(int fromIndex) {
-            if (fromIndex >= args.length)
+        public String getJoinedArgs(int fromIndex) {
+            if (fromIndex >= args.length || fromIndex < 0)
                 throw new IllegalArgumentException("invalid index! The arguments array only has a total length of " + args.length);
             return String.join(" ", Arrays.asList(args).subList(fromIndex, args.length));
         }

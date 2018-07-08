@@ -47,7 +47,7 @@ class CommandListener extends ListenerAdapter {
     }
 
     private void sendInfo(Member member, TextChannel channel, String prefix, String[] args) {
-        EmbedBuilder builder = new EmbedBuilder().setTitle("Help");
+        EmbedBuilder builder = new EmbedBuilder().setTitle("Help").setColor(settings.getHelpColor());
         if (args.length == 0) {
             String helpLabels = format("[%s]", join("|", settings.getHelpLabels()));
             builder.appendDescription(format("To learn more about a specific command, just call `%s%s <label>`.\n", prefix, helpLabels))
