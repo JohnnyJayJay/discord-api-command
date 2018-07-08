@@ -1,8 +1,9 @@
 # discord-api-command
 **A simple Command API for the JDA**
 
-*CURRENT VERSION: **3.0_3***<p>
-*Other versions: **3.0_2**, **3.0_1**, **3.0***
+*CURRENT VERSION: **3.1***<p>
+*Other versions: **3.0_3**, **3.0_2**, **3.0_1**, **3.0***
+**[Changelog](https://github.com/JohnnyJayJay/discord-api-command/blob/master/changelog.md)**
 
 ## Features:
 - easy command implementation
@@ -102,6 +103,9 @@ create a command with the label `h` whilst still being able to set `H` as a help
 #### Custom Prefixes and other cool stuff
 This API has supported guild-custom prefixes for some time now. By using `CommandSettings#setCustomPrefix` you can associate a prefix to a specific guild. Though it is important
 to know that this is only saved temporarily, meaning as long as the program runs. If you want to apply changes like this permanently, you have to keep track of that manually.
+
+Since version 3.1, you can also blacklist channels by using `CommandSettings#addChannelToBlacklist(long)` and passing the id. This is only for temporary usage like custom 
+prefixes.  
 
 Another thing which I personally find very cool is that you are able to easily deactivate your `CommandSettings` which also causes every command to stop working. To do so, 
 simply use `CommandSettings#deactivate`. Of course you can activate the settings again with `CommandSettings#activate`. Note that this, of course, is not possible by using a 
