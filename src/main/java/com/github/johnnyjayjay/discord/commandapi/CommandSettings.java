@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
  * To use this API, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 3.1
+ * @version 3.1_1
  */
 
 public class CommandSettings {
 
     // Logger
-    public static final Logger logger = LoggerFactory.getLogger("CommandAPI");
+    protected static final Logger logger = LoggerFactory.getLogger("CommandAPI");
 
     // Regex that only matches valid prefixes
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
@@ -49,6 +49,7 @@ public class CommandSettings {
     private boolean useShardManager;
 
     private boolean labelIgnoreCase;
+    private boolean resetCooldown;
     private boolean botExecution;
 
 
@@ -89,6 +90,7 @@ public class CommandSettings {
         this.botExecution = false;
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
+        this.resetCooldown = false;
         this.blacklistedChannels = new HashSet<>();
         this.helpLabels = new HashSet<>();
         this.prefixMap = new HashMap<>();
@@ -100,6 +102,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if the given label is invalid (contains spaces)
      */
+    @Deprecated
     public CommandSettings addHelpLabel(String label) {
         if (label.matches(VALID_LABEL))
             this.helpLabels.add(labelIgnoreCase ? label.toLowerCase() : label);
@@ -114,6 +117,7 @@ public class CommandSettings {
      * @param labels One or more labels which may later be called by members to list all commands or to show info about one specific command.
      * @return The current object. This is to use fluent interface.
      */
+    @Deprecated
     public CommandSettings addHelpLabels(@Nonnull String... labels) {
         for (String label : labels)
             this.addHelpLabel(label);
@@ -126,6 +130,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if one of the labels is not a valid label.
      */
+    @Deprecated
     public CommandSettings addHelpLabels(@Nonnull Collection<String> labels) {
         this.helpLabels.addAll(labelIgnoreCase ? labels.stream().map(String::toLowerCase).collect(Collectors.toList()) : labels);
         return this;
@@ -136,6 +141,7 @@ public class CommandSettings {
      * @param label The label to remove.
      * @return true, if the label was successfully removed. False, if not.
      */
+    @Deprecated
     public boolean removeHelpLabel(String label) {
         return this.helpLabels.remove(labelIgnoreCase ? label.toLowerCase() : label);
     }
@@ -145,6 +151,7 @@ public class CommandSettings {
      * @param labels The help labels to remove.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
+    @Deprecated
     public boolean removeHelpLabels(@Nonnull String... labels) {
         boolean success = true;
         for (String label : labels) {
@@ -160,6 +167,7 @@ public class CommandSettings {
      * @param labels The Set of labels that are to be removed.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
      */
+    @Deprecated
     public boolean removeHelpLabels(@Nonnull Collection<String> labels) {
         return this.helpLabels.removeAll(labelIgnoreCase ? labels.stream().map(String::toLowerCase).collect(Collectors.toList()) : labels);
     }
@@ -168,6 +176,7 @@ public class CommandSettings {
      * This can be used to deactivate the help labels. Removes every help label.
      * @return The current object. This is to use fluent interface.
      */
+    @Deprecated
     public CommandSettings clearHelpLabels() {
         this.helpLabels.clear();
         return this;
@@ -348,13 +357,15 @@ public class CommandSettings {
     /**
      * Use this method to set the default prefix.
      * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.
+     * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
-    public void setDefaultPrefix(@Nonnull String prefix) {
+    public CommandSettings setDefaultPrefix(@Nonnull String prefix) {
         if (prefix.matches(VALID_PREFIX))
             this.defaultPrefix = prefix;
         else
             throw new CommandSetException(INVALID_PREFIX_MESSAGE);
+        return this;
     }
 
     /**
@@ -362,12 +373,29 @@ public class CommandSettings {
      * You can remove the custom prefix from a guild by setting its prefix to null.
      * @param guildId The guild id as a long.
      * @param prefix The nullable prefix to be set.
+     * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
-    public void setCustomPrefix(long guildId, @Nullable String prefix) {
+    public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
             throw new CommandSetException(INVALID_PREFIX_MESSAGE);
         this.prefixMap.put(guildId, prefix);
+        return this;
+    }
+
+    /**
+     * You may use this method as another way to add custom prefixes. This might be useful if you have many guilds to set
+     * prefixes for, because this bulk adds the Map parameter.
+     * @param guildIdPrefixMap A Map which contains the prefix for each guild to add. Key: guild ID (Long), Value: prefix (String)
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if one of the prefixes is not valid.
+     */
+    public CommandSettings setCustomPrefixes(@Nonnull Map<Long, String> guildIdPrefixMap) {
+        if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(VALID_PREFIX)))
+            prefixMap.putAll(guildIdPrefixMap);
+        else
+            throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE);
+        return this;
     }
 
     /**
@@ -377,6 +405,20 @@ public class CommandSettings {
      */
     public CommandSettings setCooldown(long msCooldown) {
         this.cooldown = msCooldown;
+        return this;
+    }
+
+    /**
+     * Sets the parameter resetCooldown. Should be used in combination with the cooldown function of this API.
+     * By default, this is false.
+     * @param resetCooldown True: The command cooldown is reset on each attempt to execute a command. I.e.:
+     *                      A User executes an command and gets a 10 second cooldown. If he tries to execute another command within these 10 seconds,
+     *                      the command isn't executed and the cooldown is at 10 seconds again.<p>
+     *                      False: Once the cooldown is activated, it will not be reset by further attempts to execute commands.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings setResetCooldown(boolean resetCooldown) {
+        this.resetCooldown = resetCooldown;
         return this;
     }
 
@@ -459,18 +501,29 @@ public class CommandSettings {
     }
 
     /**
-     * Returns every registered label in a Set. Note that in case you activated labelIgnoreCase, every label in there will be in lower case.
+     * Returns every registered label in a Set. Note that in case you activated isLabelIgnoreCase, every label in there will be in lower case.
      * Adding or removing something will not have any effect. This can primarily be used to iterate over the labels.
-     * @return a Set of labels.
+     * @return an unmodifiable Set of labels.
      */
     public Set<String> getLabelSet() {
         return Collections.unmodifiableSet(this.commands.keySet());
     }
 
     /**
+     * Returns every registered label for an ICommand instance in an immutable Set. Note that in case you activated isLabelIgnoreCase, every label in there will be in lower case.
+     * Adding or removing something will not have any effect. This can primarily be used to get a command's aliases.
+     * @param command The ICommand instance to get the labels from
+     * @return an unmodifiable Set of labels.
+     */
+    public Set<String> getLabels(ICommand command) {
+        return Collections.unmodifiableSet(this.commands.keySet().stream().filter((label) -> this.commands.get(label).equals(command)).collect(Collectors.toSet()));
+    }
+
+    /**
      * Returns all of the registered help labels.
      * @return an unmodifiable Set of Strings that are registered as help labels.
      */
+    @Deprecated
     public Set<String> getHelpLabelSet() {
         return Collections.unmodifiableSet(this.helpLabels);
     }
@@ -487,8 +540,12 @@ public class CommandSettings {
         return this.cooldown;
     }
 
-    protected boolean labelIgnoreCase() {
+    protected boolean isLabelIgnoreCase() {
         return this.labelIgnoreCase;
+    }
+
+    protected boolean isResetCooldown() {
+        return resetCooldown;
     }
 
     protected boolean botsMayExecute() {

@@ -25,6 +25,10 @@ public class Main {
                 .activate(); // Activating! Very important!
     }
 
+    static class CooleClass {
+
+    }
+
     public static String getPrefix(long guildId) {
         return settings.getPrefix(guildId);
     }

@@ -1,7 +1,6 @@
 import com.github.johnnyjayjay.discord.commandapi.CommandEvent;
 import com.github.johnnyjayjay.discord.commandapi.CommandSettings;
 import com.github.johnnyjayjay.discord.commandapi.ICommand;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -27,7 +26,7 @@ public class PrefixCommand implements ICommand {
                 channel.sendMessage("Invalid prefix!").queue();
             }
         } else {
-            channel.sendMessage("Must provide a prefix as an argument! Info:\n" + this.info(event.getGuild())).queue();
+            channel.sendMessage("Must provide a prefix as an argument! Info:\n" + this.info(event.getMember())).queue();
         }
     }
 
