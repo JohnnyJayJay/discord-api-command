@@ -18,7 +18,7 @@ public class Main {
         // default prefix shall be "!" and we want the labels to be case insensitive.
         settings = new CommandSettings("!", jda, true);
         settings.setCooldown(3000) // commands can only be executed every 3 seconds now
-                .setHelpLabels("help", "helpme") // help can now be demanded by calling one of these labels.
+                .addHelpLabels("help", "helpme") // help can now be demanded by calling one of these labels.
                 .put(new PingCommand(), "ping")
                 .put(new PrefixCommand(settings), "setprefix")
                 .put(new KillCommand(settings), "kill", "deactivate", "shutdown") // setting aliases

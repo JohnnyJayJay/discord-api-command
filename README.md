@@ -86,7 +86,7 @@ What if we wanted to use this help command? Then we only have to adjust one thin
 ```java
 CommandSettings settings = new CommandSettings("!", jda, true);  
 settings.setCooldown(3000) // new: you can now set a command cooldown (here: 3 seconds)
-        .setHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
+        .addHelpLabels("help", "helpme", "h") // Again: Varargs! label case insensivity also applies to help labels
         .put(new PingCommand(), "ping", "pingpong", "p")
         .activate();
 ```
