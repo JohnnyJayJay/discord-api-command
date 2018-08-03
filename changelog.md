@@ -1,6 +1,9 @@
 # Changelog
 
-###3.1_1
+### Help Command changes
+- Added classes AbstractHelpCommand and DefaultHelpCommand
+
+### 3.1_1
 - Updated to JDA version 3.7.1_387
 - Adjusted cooldown system: it is now configurable whether the cooldown will reset for each command execution attempt
 - Deprecated help label methods: They will be removed in the near future as the help label system will be merged with the normal command system

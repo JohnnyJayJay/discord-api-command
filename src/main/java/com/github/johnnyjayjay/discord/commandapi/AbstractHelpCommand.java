@@ -7,6 +7,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+// TODO: 03.08.2018 Docs 
+/**
+ * A template for own help command implementations.
+ * This class implements ICommand, therefore each sub class can be added as a normal command with CommandSettings#put.
+ * The framework provides a default implementation of this class, DefaultHelpCommand.
+ * @author JohnnyJayJay
+ * @version 
+ * @see DefaultHelpCommand
+ */
 public abstract class AbstractHelpCommand implements ICommand {
 
     protected final CommandSettings settings;
@@ -14,7 +23,7 @@ public abstract class AbstractHelpCommand implements ICommand {
     protected AbstractHelpCommand(CommandSettings settings) {
         this.settings = settings;
     }
-
+    
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         String prefix = settings.getPrefix(event.getGuild().getIdLong());
@@ -32,8 +41,21 @@ public abstract class AbstractHelpCommand implements ICommand {
         }
     }
 
+    /**
+     * 
+     * @param event
+     * @param prefix
+     * @param commands
+     */
     public abstract void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands);
 
+    /**
+     * 
+     * @param event
+     * @param prefix
+     * @param command
+     * @param labels
+     */
     public abstract void provideSpecificHelp(CommandEvent event, String prefix, ICommand command, Set<String> labels);
 
 }

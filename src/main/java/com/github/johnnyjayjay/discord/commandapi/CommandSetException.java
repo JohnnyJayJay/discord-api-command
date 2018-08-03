@@ -5,6 +5,7 @@ package com.github.johnnyjayjay.discord.commandapi;
  * CommandSetExceptions are RuntimeExceptions.
  * @author Johnny_JayJay
  * @version 3.1_1
+ * @see RuntimeException
  */
 public class CommandSetException extends RuntimeException {
     public CommandSetException(String msg) {
