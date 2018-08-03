@@ -86,7 +86,7 @@ public class CommandSettings {
         this.listener = new CommandListener(this);
         this.activated = false;
         this.cooldown = 0;
-        this.helpColor = Color.LIGHT_GRAY;
+        this.helpColor = null;
         this.botExecution = false;
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
@@ -552,6 +552,7 @@ public class CommandSettings {
         return this.botExecution;
     }
 
+    @Deprecated
     protected Set<String> getHelpLabels() {
         return this.helpLabels;
     }
