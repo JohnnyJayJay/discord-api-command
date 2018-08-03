@@ -38,7 +38,7 @@ class CommandListener extends ListenerAdapter {
                     return;
                 }
                 cooldowns.put(userId, timestamp);
-                CommandEvent.Command cmd = new CommandEvent.Command(raw, prefix, settings);
+                CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings);
                 if (cmd.getExecutor() != null) {
                     cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
                             event.getMember(), event.getChannel(), cmd.getArgs());

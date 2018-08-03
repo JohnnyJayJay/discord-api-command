@@ -1,5 +1,6 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -30,5 +31,6 @@ public interface ICommand {
     default String info(Member member) {
         return "No info, description or help set for this command";
     }
+
 
 }

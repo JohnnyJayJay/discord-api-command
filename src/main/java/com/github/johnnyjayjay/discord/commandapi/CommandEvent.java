@@ -127,6 +127,10 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         return this.guild.getSelfMember().hasPermission(this.channel, permissions);
     }
 
+    protected static Command parseCommand(String raw, String prefix, CommandSettings settings) {
+        return new Command(raw, prefix, settings);
+    }
+
     /**
      * Describes an executed Command. <p>
      * Is used to parse a message which seems to be a command.
@@ -135,22 +139,28 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      */
     public static class Command {
 
-        private ICommand command;
+        private final ICommand command;
         private final String joinedArgs;
         private final String rawArgs;
         private final String rawMessage;
         private final String label;
         private final String[] args;
 
-        Command(String raw, String prefix, CommandSettings settings) {
+        private Command(String raw, String prefix, CommandSettings settings) {
             String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
-            this.rawMessage = raw;
-            this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
             this.label = settings.isLabelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];;
-            this.joinedArgs = String.join(" ", this.args);
-            this.rawArgs = raw.replaceFirst(prefix + this.label + "\\s+", "");
-            if (settings.getCommands().containsKey(this.label)) {
+            if (!settings.getCommands().containsKey(this.label)) {
+                this.command = null;
+                this.joinedArgs = null;
+                this.rawMessage = null;
+                this.rawArgs = null;
+                this.args = null;
+            } else {
                 this.command = settings.getCommands().get(this.label);
+                this.rawMessage = raw;
+                this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
+                this.joinedArgs = String.join(" ", this.args);
+                this.rawArgs = raw.replaceFirst(prefix + this.label + "\\s+", "");
             }
         }
 

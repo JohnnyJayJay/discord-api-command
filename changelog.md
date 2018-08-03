@@ -11,6 +11,7 @@
 - Added method `CommandEvent#respond` with overloads
 - Improved Parsing in `CommandEvent.Command`
 - Added method `CommandSettings#getLabels(ICommand)` to get a Set of labels for a specific command
+- Added more fields to `CommandEvent.Command`
 
 ### 3.1
 - Changed setCooldown-method's return to `this`
