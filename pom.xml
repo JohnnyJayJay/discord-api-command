@@ -7,7 +7,8 @@
     <groupId>com.github.johnnyjayjay</groupId>
     <artifactId>CommandAPI</artifactId>
     <packaging>jar</packaging>
-    <version>3.1</version>
+    <version>3.2-SNAPSHOT</version>
+
     <build>
         <plugins>
             <plugin>
@@ -30,12 +31,52 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
-    <name>CommandAPI</name>
-    <description>A simple CommandAPI for JDA</description>
-    <url>http://github.com/johnnyjayjay/discord-api-command</url>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>A simple command api for JDA. Visit its github repository for more information.</description>
+    <url>https://github.com/JohnnyJayJay/discord-api-command</url>
 
     <licenses>
         <license>
@@ -43,56 +84,6 @@
             <url>http://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <distributionManagement>
         <snapshotRepository>
@@ -105,23 +96,23 @@
         </repository>
     </distributionManagement>
 
-    <scm>
-        <connection>scm:git:git://github.com/johnnyjayjay/discord-api-command.git</connection>
-        <developerConnection>scm:git:ssh://github.com:johnnyjayjay/discord-api-command.git</developerConnection>
-        <url>http://github.com/johnnyjayjay/discord-api-command</url>
-    </scm>
-
     <developers>
         <developer>
             <name>JohnnyJayJay</name>
             <email>johnnyjayjay02@gmail.com</email>
             <organization>Private</organization>
-            <organizationUrl>http://github.com/johnnyjayjay/</organizationUrl>
+            <organizationUrl>https://github.com/JohnnyJayJay/</organizationUrl>
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:git://github.com/JohnnyJayJay/discord-api-command.git</connection>
+        <developerConnection>scm:git:ssh://github.com:JohnnyJayJay/discord-api-command.git</developerConnection>
+        <url>http://github.com/JohnnyJayJay/discord-api-command</url>
+    </scm>
+
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceencoding>UTF-8</project.build.sourceencoding>
     </properties>
 
     <repositories>
@@ -136,13 +127,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.6.0_367</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
+            <version>3.7.1_387</version>
         </dependency>
     </dependencies>
-
 </project>
