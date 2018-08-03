@@ -24,6 +24,7 @@ class CommandListener extends ListenerAdapter {
         this.cooldowns = new HashMap<>();
     }
 
+    // TODO: 03.08.2018 clean this stuff
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if (!settings.getBlacklistedChannels().contains(event.getChannel().getIdLong()) && (!event.getAuthor().isBot() || settings.botsMayExecute())) {
@@ -40,7 +41,7 @@ class CommandListener extends ListenerAdapter {
                 cooldowns.put(userId, timestamp);
                 CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings);
                 if (cmd.getExecutor() != null) {
-                    cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
+                    cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings),
                             event.getMember(), event.getChannel(), cmd.getArgs());
                 } else if (settings.getHelpLabels().contains(cmd.getLabel()) && event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
                     this.sendInfo(event.getMember(), event.getChannel(), prefix, cmd.getArgs());

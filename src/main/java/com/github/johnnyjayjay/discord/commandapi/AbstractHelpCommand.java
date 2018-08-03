@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-// TODO: 03.08.2018 Docs 
 /**
  * A template for own help command implementations.
  * This class implements ICommand, therefore each sub class can be added as a normal command with CommandSettings#put.
@@ -18,14 +17,10 @@ import java.util.Set;
  */
 public abstract class AbstractHelpCommand implements ICommand {
 
-    protected final CommandSettings settings;
-
-    protected AbstractHelpCommand(CommandSettings settings) {
-        this.settings = settings;
-    }
     
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
+        CommandSettings settings = event.getCommandSettings();
         String prefix = settings.getPrefix(event.getGuild().getIdLong());
         Map<String, ICommand> unmodifiableCommands = Collections.unmodifiableMap(settings.getCommands());
         if (args.length == 1) {
@@ -42,19 +37,20 @@ public abstract class AbstractHelpCommand implements ICommand {
     }
 
     /**
-     * 
-     * @param event
-     * @param prefix
-     * @param commands
+     * This method is called if someone uses this command with no parameters or doesn't give a valid label as an argument.
+     * The best use would be to display all commands or provide general help in another way.
+     * @param event the CommandEvent as for usual commands.
+     * @param prefix The prefix of the guild this command was called on.
+     * @param commands an unmodifiable Map that contains all the prefixes with their corresponding commands that are registered for these CommandSettings.
      */
     public abstract void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands);
 
     /**
-     * 
-     * @param event
-     * @param prefix
-     * @param command
-     * @param labels
+     * This method is called if someone calls the help command and provides a valid label as the first argument.
+     * @param event the CommandEvent as for usual commands.
+     * @param prefix The prefix of the guild this command was called on.
+     * @param command The ICommand that the help was requested for.
+     * @param labels All the labels that are associated with the ICommand instance.
      */
     public abstract void provideSpecificHelp(CommandEvent event, String prefix, ICommand command, Set<String> labels);
 

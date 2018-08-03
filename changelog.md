@@ -2,6 +2,8 @@
 
 ### Help Command changes
 - Added classes AbstractHelpCommand and DefaultHelpCommand
+- Added method `getCommandSettings` in `CommandEvent`
+- Annotated `ICommand` as a `FunctionalInterface`
 
 ### 3.1_1
 - Updated to JDA version 3.7.1_387

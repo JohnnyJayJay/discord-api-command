@@ -20,10 +20,12 @@ import java.util.Optional;
 public class CommandEvent extends GuildMessageReceivedEvent {
 
     private final Command command;
+    private final CommandSettings settings;
 
-    public CommandEvent(JDA api, long responseNumber, Message message, Command command) {
+    public CommandEvent(JDA api, long responseNumber, Message message, Command command, CommandSettings settings) {
         super(api, responseNumber, message);
         this.command = command;
+        this.settings = settings;
     }
 
     /**
@@ -59,6 +61,15 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      */
     public Command getCommand() {
         return command;
+    }
+
+    /**
+     * Returns the CommandSettings instance this command was called for.
+     * @return an instance of CommandSettings.
+     * @see CommandSettings
+     */
+    public CommandSettings getCommandSettings() {
+        return settings;
     }
 
     /**

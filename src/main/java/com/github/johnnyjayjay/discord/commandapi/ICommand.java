@@ -4,14 +4,17 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
+import java.util.Set;
+
 /**
  * An interface used to describe a command class.
  * In order to use this API, every class which is supposed to execute commands must implement this interface.
  * @author Johnny_JayJay
  * @version 3.1_1
  */
-
+@FunctionalInterface
 public interface ICommand {
+
 
     /**
      * Everything that happens if the command is executed should be written here.
@@ -32,5 +35,5 @@ public interface ICommand {
         return "No info, description or help set for this command";
     }
 
-
+    // TODO: 03.08.2018 find another solution for info
 }

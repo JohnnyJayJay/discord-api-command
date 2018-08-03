@@ -433,9 +433,11 @@ public class CommandSettings {
     }
 
     /**
-     * Sets the color the help message embed will have. By default, it is Color.LIGHT_GRAY.
+     * Sets the color the help message embed will have if you use DefaultHelpCommand.
+     * By default, it will always be the color of the self member.
      * @param color The color to set.
      * @return The current object. This is to use fluent interface.
+     * @see DefaultHelpCommand
      */
     public CommandSettings setHelpCommandColor(Color color) {
         this.helpColor = color;
