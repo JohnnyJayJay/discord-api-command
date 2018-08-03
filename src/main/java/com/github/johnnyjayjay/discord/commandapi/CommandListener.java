@@ -32,10 +32,13 @@ class CommandListener extends ListenerAdapter {
             if (raw.startsWith(prefix)) {
                 long timestamp = System.currentTimeMillis();
                 long userId = event.getAuthor().getIdLong();
-                if (cooldowns.containsKey(userId) && (timestamp - cooldowns.get(userId)) < settings.getCooldown())
+                if (cooldowns.containsKey(userId) && (timestamp - cooldowns.get(userId)) < settings.getCooldown()) {
+                    if (settings.isResetCooldown())
+                        cooldowns.put(userId, timestamp);
                     return;
+                }
                 cooldowns.put(userId, timestamp);
-                CommandEvent.Command cmd = new CommandEvent.Command(raw, prefix, settings);
+                CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings);
                 if (cmd.getExecutor() != null) {
                     cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd),
                             event.getMember(), event.getChannel(), cmd.getArgs());

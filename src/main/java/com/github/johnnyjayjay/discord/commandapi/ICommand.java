@@ -1,5 +1,6 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -7,7 +8,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
  * An interface used to describe a command class.
  * In order to use this API, every class which is supposed to execute commands must implement this interface.
  * @author Johnny_JayJay
- * @version 3.1
+ * @version 3.1_1
  */
 
 public interface ICommand {
@@ -30,5 +31,6 @@ public interface ICommand {
     default String info(Member member) {
         return "No info, description or help set for this command";
     }
+
 
 }
