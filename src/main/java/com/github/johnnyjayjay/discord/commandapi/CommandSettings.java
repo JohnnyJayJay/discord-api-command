@@ -521,6 +521,8 @@ public class CommandSettings {
         return Collections.unmodifiableSet(this.commands.keySet().stream().filter((label) -> this.commands.get(label).equals(command)).collect(Collectors.toSet()));
     }
 
+    // TODO: 04.08.2018 deprecation warnings for this version
+    
     /**
      * Returns all of the registered help labels.
      * @return an unmodifiable Set of Strings that are registered as help labels.
