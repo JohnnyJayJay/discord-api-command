@@ -12,10 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * To use this API, create a new object of this class and add your command classes by using add(...)<p>
+ * To use this framework, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 3.1_1
+ * @version 3.2
  */
 
 public class CommandSettings {
@@ -86,7 +86,7 @@ public class CommandSettings {
         this.listener = new CommandListener(this);
         this.activated = false;
         this.cooldown = 0;
-        this.helpColor = Color.LIGHT_GRAY;
+        this.helpColor = null;
         this.botExecution = false;
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
@@ -433,9 +433,11 @@ public class CommandSettings {
     }
 
     /**
-     * Sets the color the help message embed will have. By default, it is Color.LIGHT_GRAY.
+     * Sets the color the help message embed will have if you use DefaultHelpCommand.
+     * By default, it will always be the color of the self member.
      * @param color The color to set.
      * @return The current object. This is to use fluent interface.
+     * @see DefaultHelpCommand
      */
     public CommandSettings setHelpCommandColor(Color color) {
         this.helpColor = color;
@@ -519,6 +521,8 @@ public class CommandSettings {
         return Collections.unmodifiableSet(this.commands.keySet().stream().filter((label) -> this.commands.get(label).equals(command)).collect(Collectors.toSet()));
     }
 
+    // TODO: 04.08.2018 deprecation warnings for this version
+    
     /**
      * Returns all of the registered help labels.
      * @return an unmodifiable Set of Strings that are registered as help labels.
@@ -552,6 +556,7 @@ public class CommandSettings {
         return this.botExecution;
     }
 
+    @Deprecated
     protected Set<String> getHelpLabels() {
         return this.helpLabels;
     }
