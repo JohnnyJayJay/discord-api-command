@@ -1,8 +1,10 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,10 +15,12 @@ import java.util.stream.Collectors;
  * If you want to use this, add a new instance of this class as a command in your CommandSettings with the put-method.
  * This class is final. To create your own help command implementation, please refer to AbstractHelpCommand.
  * @author JohnnyJayJay
- * @version
+ * @version 3.2
  * @see AbstractHelpCommand
  */
 public final class DefaultHelpCommand extends AbstractHelpCommand {
+
+    private final Message info = new MessageBuilder().setContent("Command info:\nShows all available commands or provides help for a specific command.").build();
 
     /**
      * Lists all commands along with the information that more help can be received by adding the optional label parameter.
@@ -27,9 +31,9 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
         if (!selfMember.hasPermission(event.getChannel(), Permission.MESSAGE_WRITE))
             return;
 
-        EmbedBuilder embed = getBuilder(selfMember, event.getCommandSettings());
-        // There may be problems here, since it is possible to add this command on another CommandSettings-instance than the attribute of this class.
-        String helpLabels = "[" + String.join("|", event.getCommandSettings().getLabels(this)) + "]";
+        CommandSettings settings = event.getCommandSettings();
+        EmbedBuilder embed = new EmbedBuilder().setColor(settings.getHelpColor() != null ? settings.getHelpColor() : selfMember.getColor());
+        String helpLabels = "[" + String.join("|", settings.getLabels(this)) + "]";
         embed.appendDescription("To learn more about a specific command, just call `").appendDescription(prefix)
                 .appendDescription(helpLabels).appendDescription(" <label>`.\nThe following commands are currently available:\n");
         String commandsList = commands.keySet().stream().map((label) -> prefix + label).collect(Collectors.joining(", "));
@@ -49,24 +53,15 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
         if (!selfMember.hasPermission(event.getChannel(), Permission.MESSAGE_WRITE))
             return;
 
-        CommandSettings settings = event.getCommandSettings();
-        EmbedBuilder embed = getBuilder(selfMember, settings);
-        embed.appendDescription("**Command Info for:** `").appendDescription("[")
-                .appendDescription(String.join("|", settings.getLabels(command))).appendDescription("]`\n\n")
-                .appendDescription(settings.getCommands().get(event.getArgs()[0]).info(event.getMember()));
-        event.getChannel().sendMessage(embed.build()).queue();
-    }
-
-    private EmbedBuilder getBuilder(Member selfMember, CommandSettings settings) {
-        return new EmbedBuilder().setColor(settings.getHelpColor() != null ? settings.getHelpColor() : selfMember.getColor());
+        event.getChannel().sendMessage(command.info(event.getMember(), prefix, labels)).queue();
     }
 
     /**
      * Returns the default info for this command.
-     * @return "Shows all available commands or provides help for a specific command. Usage: `help <label>`"
+     * @return A message with content "Shows all available commands or provides help for a specific command."
      */
     @Override
-    public String info(Member member) {
-        return "Shows all available commands or provides help for a specific command. Usage: `help <label>`";
+    public Message info(Member member, String prefix, Set<String> labels) {
+        return info;
     }
 }

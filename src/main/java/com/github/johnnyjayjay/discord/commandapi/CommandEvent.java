@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command.
  * @author Johnny_JayJay
- * @version 3.1_1
+ * @version 3.2
  * @see GuildMessageReceivedEvent
  */
 public class CommandEvent extends GuildMessageReceivedEvent {

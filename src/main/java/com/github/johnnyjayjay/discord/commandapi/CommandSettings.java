@@ -12,10 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * To use this API, create a new object of this class and add your command classes by using add(...)<p>
+ * To use this framework, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 3.1_1
+ * @version 3.2
  */
 
 public class CommandSettings {
