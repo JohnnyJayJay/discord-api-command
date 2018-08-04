@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class CommandSettings {
 
     // Logger
-    protected static final Logger logger = LoggerFactory.getLogger("CommandAPI");
+    protected static final Logger LOGGER = LoggerFactory.getLogger("CommandAPI");
 
     // Regex that only matches valid prefixes
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
