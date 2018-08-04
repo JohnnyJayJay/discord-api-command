@@ -17,7 +17,6 @@ class CommandListener extends ListenerAdapter {
         this.cooldowns = new HashMap<>();
     }
 
-    // TODO: 03.08.2018 clean this stuff
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if (!settings.getBlacklistedChannels().contains(event.getChannel().getIdLong()) && (!event.getAuthor().isBot() || settings.botsMayExecute())) {
