@@ -36,7 +36,6 @@ public class CommandSettings {
     private Color helpColor;
 
     private Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
-    private Set<String> helpLabels; // labels which trigger the auto-generated help command
     private Map<Long, String> prefixMap; // Long: GuildID, String: prefix
 
     private Map<String, ICommand> commands; // String: command label, ICommand: command class
@@ -92,94 +91,7 @@ public class CommandSettings {
         this.labelIgnoreCase = labelIgnoreCase;
         this.resetCooldown = false;
         this.blacklistedChannels = new HashSet<>();
-        this.helpLabels = new HashSet<>();
         this.prefixMap = new HashMap<>();
-    }
-
-    /**
-     * Method to add one help label.
-     * @param label The label to add.
-     * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if the given label is invalid (contains spaces)
-     */
-    @Deprecated
-    public CommandSettings addHelpLabel(String label) {
-        if (label.matches(VALID_LABEL))
-            this.helpLabels.add(labelIgnoreCase ? label.toLowerCase() : label);
-        else
-            throw new CommandSetException(INVALID_LABEL_MESSAGE);
-
-        return this;
-    }
-
-    /**
-     * Use this method to add help labels. This will only work if you instantiated this class with the parameter useHelpCommand as true.
-     * @param labels One or more labels which may later be called by members to list all commands or to show info about one specific command.
-     * @return The current object. This is to use fluent interface.
-     */
-    @Deprecated
-    public CommandSettings addHelpLabels(@Nonnull String... labels) {
-        for (String label : labels)
-            this.addHelpLabel(label);
-        return this;
-    }
-
-    /**
-     * Adds multiple labels from a String Set.
-     * @param labels A Set which contains the labels you want to add.
-     * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if one of the labels is not a valid label.
-     */
-    @Deprecated
-    public CommandSettings addHelpLabels(@Nonnull Collection<String> labels) {
-        this.helpLabels.addAll(labelIgnoreCase ? labels.stream().map(String::toLowerCase).collect(Collectors.toList()) : labels);
-        return this;
-    }
-
-    /**
-     * This method removes one specific help label from the help label Set.
-     * @param label The label to remove.
-     * @return true, if the label was successfully removed. False, if not.
-     */
-    @Deprecated
-    public boolean removeHelpLabel(String label) {
-        return this.helpLabels.remove(labelIgnoreCase ? label.toLowerCase() : label);
-    }
-
-    /**
-     * This can be used to remove some help labels, but not all of them.
-     * @param labels The help labels to remove.
-     * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
-     */
-    @Deprecated
-    public boolean removeHelpLabels(@Nonnull String... labels) {
-        boolean success = true;
-        for (String label : labels) {
-            if (!this.removeHelpLabel(label)) {
-                success = false;
-            }
-        }
-        return success;
-    }
-
-    /**
-     * Removes all labels from a Set.
-     * @param labels The Set of labels that are to be removed.
-     * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
-     */
-    @Deprecated
-    public boolean removeHelpLabels(@Nonnull Collection<String> labels) {
-        return this.helpLabels.removeAll(labelIgnoreCase ? labels.stream().map(String::toLowerCase).collect(Collectors.toList()) : labels);
-    }
-
-    /**
-     * This can be used to deactivate the help labels. Removes every help label.
-     * @return The current object. This is to use fluent interface.
-     */
-    @Deprecated
-    public CommandSettings clearHelpLabels() {
-        this.helpLabels.clear();
-        return this;
     }
 
     /**
@@ -346,7 +258,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clear() {
-        this.clearBlacklist().clearCommands().clearHelpLabels();
+        this.clearBlacklist().clearCommands();
         this.botExecution = false;
         this.cooldown = 0;
         if (this.activated)
@@ -411,7 +323,7 @@ public class CommandSettings {
     /**
      * Sets the parameter resetCooldown. Should be used in combination with the cooldown function of this API.
      * By default, this is false.
-     * @param resetCooldown True: The command cooldown is reset on each attempt to execute a command. I.e.:
+     * @param resetCooldown True: The command cooldown is reset on each attempt to execute a command. E.g.:
      *                      A User executes an command and gets a 10 second cooldown. If he tries to execute another command within these 10 seconds,
      *                      the command isn't executed and the cooldown is at 10 seconds again.<p>
      *                      False: Once the cooldown is activated, it will not be reset by further attempts to execute commands.
@@ -521,17 +433,6 @@ public class CommandSettings {
         return Collections.unmodifiableSet(this.commands.keySet().stream().filter((label) -> this.commands.get(label).equals(command)).collect(Collectors.toSet()));
     }
 
-    // TODO: 04.08.2018 deprecation warnings for this version
-    
-    /**
-     * Returns all of the registered help labels.
-     * @return an unmodifiable Set of Strings that are registered as help labels.
-     */
-    @Deprecated
-    public Set<String> getHelpLabelSet() {
-        return Collections.unmodifiableSet(this.helpLabels);
-    }
-
     /**
      * Returns whether this instance is activated or not.
      * @return true, if it is, false, if not.
@@ -554,11 +455,6 @@ public class CommandSettings {
 
     protected boolean botsMayExecute() {
         return this.botExecution;
-    }
-
-    @Deprecated
-    protected Set<String> getHelpLabels() {
-        return this.helpLabels;
     }
 
     protected Map<String, ICommand> getCommands() {

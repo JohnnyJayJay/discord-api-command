@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
  * @author Johnny_JayJay
  * @version 0.1-SNAPSHOT
  */
+// TODO: 04.08.2018 Write proper examples that make sense 
 public class Main {
 
     private static CommandSettings settings;
