@@ -16,7 +16,7 @@ public class Main {
     private static CommandSettings settings;
 
     public static void main(String[] args) throws LoginException, InterruptedException {
-        JDA jda = new JDABuilder(AccountType.BOT).setToken("NDQwMjIyMTc1NjkwMDk2NjYx.DkZHIg.Fu6w20j9htc0Z_-G7W6S1k9Yumw").buildBlocking();
+        JDA jda = new JDABuilder(AccountType.BOT).setToken(Secrets.TOKEN).buildBlocking();
         // default prefix shall be "!" and we want the labels to be case insensitive.
         settings = new CommandSettings("!", jda, true);
         settings.setCooldown(3000) // commands can only be executed every 3 seconds now

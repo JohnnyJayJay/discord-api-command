@@ -22,6 +22,7 @@ public abstract class AbstractCommand implements ICommand {
     private final Map<SubCommand, Method> subCommands;
 
     protected AbstractCommand() {
+        // This has to be changed as soon as onCommand changes
         final Class<?>[] parameterTypes = {CommandEvent.class, Member.class, TextChannel.class, String[].class};
         this.subCommands = new HashMap<>();
         for (Method method : this.getClass().getDeclaredMethods()) {
@@ -44,14 +45,16 @@ public abstract class AbstractCommand implements ICommand {
             try {
                 method.invoke(this, event, member, channel, args);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                CommandSettings.LOGGER.error("An Exception occurred while trying to invoke sub command method", e);
+                CommandSettings.LOGGER.error("An Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
             }
         });
     }
 
     private Optional<Method> bestMethod(Set<SubCommand> possible, String joinedArgs) {
         Optional<Method> ret = Optional.empty();
-        if (!possible.isEmpty()) {
+        if (possible.size() == 1) {
+            ret = possible.stream().map(subCommands::get).findFirst();
+        } else if (!possible.isEmpty()) {
             SubCommand longest = null;
             int longestPrefixLength = 0;
             for (SubCommand command : possible) {
@@ -64,9 +67,8 @@ public abstract class AbstractCommand implements ICommand {
 
                 int minLength = Math.min(name.length(), joinedArgs.length());
                 if (minLength <= longestPrefixLength) {
-                    if (name.isEmpty() && longest == null) {
+                    if (name.isEmpty() && longest == null)
                         longest = command;
-                    }
                     continue;
                 }
 
