@@ -5,4 +5,4 @@ jdk:
 - oraclejdk9
 - oraclejdk10
 
-script: mvn clean test verify
+script: mvn clean test
