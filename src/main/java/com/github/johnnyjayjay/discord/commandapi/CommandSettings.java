@@ -523,6 +523,15 @@ public class CommandSettings {
     }
 
     /**
+     * Returns whether the given channel id is blacklisted.
+     * @param channelId The id of the channel to check for.
+     * @return true, if the blacklist Set contains this id. False, if not.
+     */
+    public boolean isBlacklisted(long channelId) {
+        return this.blacklistedChannels.contains(channelId);
+    }
+
+    /**
      * Returns every registered label in a Set. Note that in case you activated isLabelIgnoreCase, every label in there will be in lower case.
      * Adding or removing something will not have any effect. This can primarily be used to iterate over the labels.
      * @return an unmodifiable Set of labels.

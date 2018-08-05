@@ -1,6 +1,6 @@
 # Changelog
 
-###3.1_1
+### 3.1_1
 - Updated to JDA version 3.7.1_387
 - Adjusted cooldown system: it is now configurable whether the cooldown will reset for each command execution attempt
 - Deprecated help label methods: They will be removed in the near future as the help label system will be merged with the normal command system
@@ -12,6 +12,7 @@
 - Improved Parsing in `CommandEvent.Command`
 - Added method `CommandSettings#getLabels(ICommand)` to get a Set of labels for a specific command
 - Added more fields to `CommandEvent.Command`
+- Added method `isBlacklisted(long)` to `CommandSettings`
 
 ### 3.1
 - Changed setCooldown-method's return to `this`
