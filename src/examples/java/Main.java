@@ -23,7 +23,7 @@ public class Main {
                 //.addHelpLabels("help", "helpme") // help can now be demanded by calling one of these labels.
                 .put(new DefaultHelpCommand(), "help", "helpme")
                 .put(new PingCommand(), "ping")
-                .put(new PrefixCommand(settings), "setprefix")
+                .put(new PrefixCommand(), "setprefix")
                 .put(new KillCommand(settings), "kill", "deactivate", "shutdown") // setting aliases
                 .activate(); // Activating! Very important!
     }

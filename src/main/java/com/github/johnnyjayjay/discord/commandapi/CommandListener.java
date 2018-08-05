@@ -1,5 +1,8 @@
 package com.github.johnnyjayjay.discord.commandapi;
 
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -17,10 +20,10 @@ class CommandListener extends ListenerAdapter {
         this.cooldowns = new HashMap<>();
     }
 
-    // TODO: 03.08.2018 clean this stuff
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        if (!settings.getBlacklistedChannels().contains(event.getChannel().getIdLong()) && (!event.getAuthor().isBot() || settings.botsMayExecute())) {
+        TextChannel channel = event.getChannel();
+        if (!settings.getBlacklistedChannels().contains(channel.getIdLong()) && (!event.getAuthor().isBot() || settings.botsMayExecute())) {
             String raw = event.getMessage().getContentRaw();
             String prefix = settings.getPrefix(event.getGuild().getIdLong());
             if (raw.startsWith(prefix)) {
@@ -35,7 +38,11 @@ class CommandListener extends ListenerAdapter {
                 CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings);
                 if (cmd.getExecutor() != null) {
                     cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings),
-                            event.getMember(), event.getChannel(), cmd.getArgs());
+                            event.getMember(), channel, cmd.getArgs());
+                } else {
+                    Message unknownCommand = settings.getUnknownCommandMessage();
+                    if (unknownCommand != null && event.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
+                        channel.sendMessage(unknownCommand).queue();
                 }
             }
         }

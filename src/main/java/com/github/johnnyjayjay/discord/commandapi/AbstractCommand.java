@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * @version 3.3
  * @see ICommand
  */
+// TODO: 06.08.2018 changelog 
 public abstract class AbstractCommand implements ICommand {
 
     private final Map<SubCommand, Method> subCommands;
@@ -34,7 +35,7 @@ public abstract class AbstractCommand implements ICommand {
     }
 
     @Override
-    public void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
+    public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         String joinedArgs = event.getCommandSettings().isLabelIgnoreCase() ? event.getCommand().getJoinedArgs().toLowerCase() : event.getCommand().getJoinedArgs();
         Member selfMember = event.getGuild().getSelfMember();
         Set<SubCommand> possibleMethods = subCommands.keySet().stream().filter((sub) -> joinedArgs.startsWith(sub.name()))
