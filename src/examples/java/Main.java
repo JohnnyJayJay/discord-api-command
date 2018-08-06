@@ -14,7 +14,7 @@ public class Main {
     private static CommandSettings settings;
 
     public static void main(String[] args) throws LoginException, InterruptedException {
-        JDA jda = new JDABuilder(AccountType.BOT).setToken("VERY-SECRET-TOKEN-PLS-DONT-STEAL").buildBlocking();
+        JDA jda = new JDABuilder(AccountType.BOT).setToken(Secrets.TOKEN).buildBlocking();
         // default prefix shall be "!" and we want the labels to be case insensitive.
         settings = new CommandSettings("!", jda, true);
         settings.setCooldown(3000) // commands can only be executed every 3 seconds now
@@ -25,9 +25,6 @@ public class Main {
                 .activate(); // Activating! Very important!
     }
 
-    static class CooleClass {
-
-    }
 
     public static String getPrefix(long guildId) {
         return settings.getPrefix(guildId);
