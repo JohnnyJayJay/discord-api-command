@@ -33,7 +33,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @param msg The message to respond with as a String.
      */
     public void respond(String msg) {
-        if (checkBotPermissions(Permission.MESSAGE_WRITE))
+        if (checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             this.getChannel().sendMessage(msg).queue();
     }
 
@@ -42,7 +42,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @param msg The message to respond with as a MessageEmbed.
      */
     public void respond(MessageEmbed msg) {
-        if (checkBotPermissions(Permission.MESSAGE_WRITE))
+        if (checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             this.getChannel().sendMessage(msg).queue();
     }
 
@@ -51,7 +51,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @param msg The message to respond with as a Message object.
      */
     public void respond(Message msg) {
-        if (checkBotPermissions(Permission.MESSAGE_WRITE))
+        if (checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             this.getChannel().sendMessage(msg).queue();
     }
 
@@ -123,7 +123,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
 
     /**
      * Returns whether the Member who executed the command has the given permissions in the event channel.
-     * @param permissions One or more Permissions to check for.
+     * @param permissions One or more Checks to check for.
      * @return true: Member has the permissions in this channel, false: they have not
      */
     public boolean checkMemberPermissions(Permission... permissions) {
@@ -132,7 +132,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
 
     /**
      * Returns whether the self member has the given permissions in the event channel.
-     * @param permissions One or more Permissions to check for.
+     * @param permissions One or more Checks to check for.
      * @return true: self member has the permissions in this channel, false: it has not
      */
     public boolean checkBotPermissions(Permission... permissions) {

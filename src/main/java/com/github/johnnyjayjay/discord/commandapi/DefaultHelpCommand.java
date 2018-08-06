@@ -28,7 +28,7 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
     @Override
     public void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands) {
         Member selfMember = event.getGuild().getSelfMember();
-        if (!selfMember.hasPermission(event.getChannel(), Permission.MESSAGE_WRITE))
+        if (!selfMember.hasPermission(event.getChannel(), Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             return;
 
         CommandSettings settings = event.getCommandSettings();
@@ -49,8 +49,7 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
      */
     @Override
     public void provideSpecificHelp(CommandEvent event, String prefix, ICommand command, Set<String> labels) {
-        Member selfMember = event.getGuild().getSelfMember();
-        if (!selfMember.hasPermission(event.getChannel(), Permission.MESSAGE_WRITE))
+        if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             return;
 
         event.getChannel().sendMessage(command.info(event.getMember(), prefix, labels)).queue();

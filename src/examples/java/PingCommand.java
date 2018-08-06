@@ -17,6 +17,7 @@ public class PingCommand implements ICommand {
 
     @Override
     public void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
+        channel.sendMessage(event.getMessage()).queue();
         if (args.length == 1 && !event.getMessage().getMentionedMembers().isEmpty()) { // argument handling
             Member target = event.getMessage().getMentionedMembers().get(0);
             MessageEmbed embed = new EmbedBuilder()

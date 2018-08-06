@@ -2,6 +2,8 @@ package com.github.johnnyjayjay.discord.commandapi;
 
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +23,19 @@ import java.util.stream.Collectors;
 public class CommandSettings {
 
     // Logger
-    protected static final Logger logger = LoggerFactory.getLogger("CommandAPI");
+    protected static final Logger LOGGER = LoggerFactory.getLogger("CommandAPI");
 
     // Regex that only matches valid prefixes
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
     // Regex that only matches valid command labels
     public static final String VALID_LABEL = "[^\\s]+";
 
+    // TODO: 05.08.2018 illegal prefix characters 
+    
     private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
     private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
 
+    private Message unknownCommandMessage;
     private String defaultPrefix;
     private long cooldown;
     private Color helpColor;
@@ -92,8 +97,8 @@ public class CommandSettings {
         this.setDefaultPrefix(defaultPrefix);
         this.labelIgnoreCase = labelIgnoreCase;
         this.resetCooldown = false;
-        this.blacklistedChannels = new HashSet<>();
         this.helpLabels = new HashSet<>();
+        this.blacklistedChannels = new HashSet<>();
         this.prefixMap = new HashMap<>();
     }
 
@@ -201,6 +206,8 @@ public class CommandSettings {
     }
 
     /**
+=======
+>>>>>>> Subcommand-System
      * Adds a given channel to the blacklist (meaning commands can not be executed in there).
      * @param channelId the id of the channel to be blacklisted.
      * @return The current object. This is to use fluent interface.
@@ -286,7 +293,7 @@ public class CommandSettings {
         if (label.matches(VALID_LABEL))
             this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
-            throw new CommandSetException(INVALID_LABEL_MESSAGE);
+            throw new CommandSetException(INVALID_LABEL_MESSAGE, new IllegalArgumentException("Label " + label + " is not valid"));
 
         return this;
     }
@@ -382,7 +389,21 @@ public class CommandSettings {
         if (prefix.matches(VALID_PREFIX))
             this.defaultPrefix = prefix;
         else
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE);
+            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
+        return this;
+    }
+
+    /**
+     * Sets a Message that will be sent in the event of a Member using the prefix without executing any valid command. By default, it is null. If it is null, no Message will be sent.
+     * @param message Nullable Message object that will be wrapped in a new MessageBuilder to prevent the usage of already sent Messages. If this is null, the message is deactivated.
+     * @return The current object. This is to use fluent interface.
+     * @see MessageBuilder
+     */
+    public CommandSettings setUnknownCommandMessage(@Nullable Message message) {
+        if (message == null)
+            this.unknownCommandMessage = null;
+        else
+            this.unknownCommandMessage = new MessageBuilder(message).build();
         return this;
     }
 
@@ -396,7 +417,7 @@ public class CommandSettings {
      */
     public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE);
+            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
         this.prefixMap.put(guildId, prefix);
         return this;
     }
@@ -412,7 +433,7 @@ public class CommandSettings {
         if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(VALID_PREFIX)))
             prefixMap.putAll(guildIdPrefixMap);
         else
-            throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE);
+            throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Invalid prefix"));
         return this;
     }
 
@@ -429,7 +450,7 @@ public class CommandSettings {
     /**
      * Sets the parameter resetCooldown. Should be used in combination with the cooldown function of this API.
      * By default, this is false.
-     * @param resetCooldown True: The command cooldown is reset on each attempt to execute a command. I.e.:
+     * @param resetCooldown True: The command cooldown is reset on each attempt to execute a command. E.g.:
      *                      A User executes an command and gets a 10 second cooldown. If he tries to execute another command within these 10 seconds,
      *                      the command isn't executed and the cooldown is at 10 seconds again.<p>
      *                      False: Once the cooldown is activated, it will not be reset by further attempts to execute commands.
@@ -572,6 +593,10 @@ public class CommandSettings {
 
     protected boolean botsMayExecute() {
         return this.botExecution;
+    }
+
+    protected Message getUnknownCommandMessage() {
+        return unknownCommandMessage;
     }
 
     protected Map<String, ICommand> getCommands() {
