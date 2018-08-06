@@ -2,7 +2,7 @@
 **A simple Command API for the JDA**
 
 *CURRENT VERSION: **3.1***<p>
-*Other versions: **3.0_3**, **3.0_2**, **3.0_1**, **3.0***
+*Other versions: **3.0_3**, **3.0_2**, **3.0_1**, **3.0***<br>
 **[Changelog](https://github.com/JohnnyJayJay/discord-api-command/blob/master/changelog.md)**
 
 ## Features:

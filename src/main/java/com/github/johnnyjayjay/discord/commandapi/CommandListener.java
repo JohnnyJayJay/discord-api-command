@@ -37,8 +37,13 @@ class CommandListener extends ListenerAdapter {
                 cooldowns.put(userId, timestamp);
                 CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings);
                 if (cmd.getExecutor() != null) {
-                    cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings),
-                            event.getMember(), channel, cmd.getArgs());
+                    try {
+                        cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings),
+                                event.getMember(), channel, cmd.getArgs());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        CommandSettings.LOGGER.warn("One of the commands had an uncaught exception:", e);
+                    }
                 } else {
                     Message unknownCommand = settings.getUnknownCommandMessage();
                     if (unknownCommand != null && event.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))

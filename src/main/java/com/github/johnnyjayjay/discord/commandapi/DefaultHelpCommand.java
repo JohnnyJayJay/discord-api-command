@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * The default implementation for AbstractHelpCommand.
  * If you want to use this, add a new instance of this class as a command in your CommandSettings with the put-method.
- * This class is final. To create your own help command implementation, please refer to AbstractHelpCommand.
+ * This class isDefault final. To create your own help command implementation, please refer to AbstractHelpCommand.
  * @author JohnnyJayJay
  * @version 3.2
  * @see AbstractHelpCommand

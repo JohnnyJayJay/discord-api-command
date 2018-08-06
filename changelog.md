@@ -3,7 +3,7 @@
 ### 3.2
 - Updated to JDA version 3.7.1_387
 - Adjusted cooldown system: it is now configurable whether the cooldown will reset for each command execution attempt
-- Deprecated help label methods: They will be removed in the near future as the help label system will be merged with the normal command system
+- Deprecated help label methods: They will be removed in the near future as the help label system is merged with the normal command system
 - Changed return type of some `CommandSettings` methods from void to `CommandSettings` to make fluent interface possible
 - Added method `setCustomPrefixes` in `CommandSettings` to bulk add custom prefixes for better performance
 - Deprecated `CommandEvent.Command#getJoinedArgs(int)` - it will be removed in the near future, there are better methods now.
@@ -16,10 +16,13 @@
 - Added classes AbstractHelpCommand and DefaultHelpCommand
 - Added method `getCommandSettings` in `CommandEvent`
 - Annotated `ICommand` as a `FunctionalInterface`
-- Removed supported for help label methods in `CommandSettings`
 - Cleaned `CommandListener`
 - Deprecated method `String info(Member)` in `ICommand`;
     New method is `Message info(Member, String, Set<String>)` because it is more flexible.
+- Added annotation `SubCommand`
+- Added class `AbstractCommand` with sub command system
+- Added configurable unknown command message
+- Made certain getters of `CommandSettings` public
 
 ### 3.1
 - Changed setCooldown-method's return to `this`
