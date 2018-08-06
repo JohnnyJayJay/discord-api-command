@@ -1,5 +1,3 @@
 .idea/*
 target/*
-*.class
-
 src/examples/java/Secrets\.java

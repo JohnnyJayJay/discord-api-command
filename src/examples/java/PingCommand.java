@@ -17,7 +17,17 @@ public class PingCommand implements ICommand {
 
     @Override
     public void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        event.getFirstUserMention().ifPresent((user) -> event.respond("You got pong'd! " + user.getAsMention()));
+        if (args.length == 1 && !event.getMessage().getMentionedMembers().isEmpty()) { // argument handling
+            Member target = event.getMessage().getMentionedMembers().get(0);
+            MessageEmbed embed = new EmbedBuilder()
+                    .setDescription("Ha! You got pong'd!")
+                    .setAuthor(member.getEffectiveName())
+                    .setColor(Color.CYAN)
+                    .build();
+            channel.sendMessage(new MessageBuilder().append(target.getAsMention()).setEmbed(embed).build()).queue();
+        } else {
+            channel.sendMessage(String.format("The bot's ping is: `%dms`", event.getJDA().getPing())).queue();
+        }
     }
 
     @Override
