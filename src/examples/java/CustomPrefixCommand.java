@@ -15,7 +15,8 @@ public class CustomPrefixCommand extends AbstractCommand {
 
     @SubCommand(isDefault = true, botPerms = {Permission.MESSAGE_WRITE})
     public void everythingElse(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        event.respond("Correct usage: `" + event.getCommandSettings().getPrefix(event.getGuild().getIdLong()) + "prefix [get|set] <custom|default> <prefix>`");
+        event.respond("Correct usage: `" + event.getCommandSettings().getPrefix(event.getGuild().getIdLong()) + "prefix [get|set] <custom|default> <prefix>`\n" +
+                "If you set a new prefix, it has to be valid, i.e. match this regex: " + CommandSettings.VALID_PREFIX);
     }
 
     @SubCommand(args = {"get"}, botPerms = {Permission.MESSAGE_WRITE})

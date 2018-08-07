@@ -19,7 +19,7 @@ import java.util.Set;
 @FunctionalInterface
 public interface ICommand {
 
-    Message defaultInfo = new MessageBuilder().setContent("No info, description or help set for this command.").build();
+    Message DEFAULT_INFO = new MessageBuilder().setContent("No info, description or help set for this command.").build();
 
     /**
      * Everything that happens if the command is executed should be written here.
@@ -55,7 +55,7 @@ public interface ICommand {
      * @see MessageBuilder
      */
     default Message info(Member member, String prefix, Set<String> labels) {
-        return defaultInfo;
+        return DEFAULT_INFO;
     }
 
 }

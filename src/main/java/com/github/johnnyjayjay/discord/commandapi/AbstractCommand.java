@@ -24,6 +24,10 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCommand implements ICommand {
 
+    protected final String MEMBER_MENTION = "<@!?\\d+>";
+    protected final String ROLE_MENTION = "<&\\d+>";
+    protected final String CHANNEL_MENTION = "<#\\d+>";
+
     private final Map<SubCommand, Method> subCommands;
 
     protected AbstractCommand() {
@@ -45,12 +49,15 @@ public abstract class AbstractCommand implements ICommand {
 
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
+        CommandSettings settings = event.getCommandSettings();
         Optional<SubCommand> matchesArgs = subCommands.keySet().stream()
                 .filter((sub) -> !sub.isDefault())
                 .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length))
                 .filter((sub) -> {
+                    String regex;
                     for (int i = 0; i < sub.args().length; i++) {
-                        if (!args[i].matches(sub.args()[i]))
+                        regex = settings.isLabelIgnoreCase() ? "(?i)" + sub.args()[i] : sub.args()[i];
+                        if (!args[i].matches(regex))
                             return false;
                     }
                     return true;

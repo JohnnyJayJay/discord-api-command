@@ -365,14 +365,17 @@ public class CommandSettings {
     }
 
     /**
-     * Resets this whole instance by clearing the commands, help labels and setting everything to how it was at the beginning.
-     * This instance will also be deactivated if it is not already.
+     * Resets this whole instance by clearing the commands and setting everything to how it was at the beginning.
+     * This instance will also be deactivated if it is not already.<br>
+     * Values that were assigned in the constructor will keep their current value.
      * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clear() {
-        this.clearBlacklist().clearCommands();
+        this.clearBlacklist().clearCommands().clearCustomPrefixes();
         this.botExecution = false;
         this.cooldown = 0;
+        this.helpColor = null;
+        this.resetCooldown = false;
         if (this.activated)
             this.deactivate();
         return this;
@@ -437,6 +440,15 @@ public class CommandSettings {
     }
 
     /**
+     * Removes all entries from the prefix map, resetting every custom prefix.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings clearCustomPrefixes() {
+        this.prefixMap.clear();
+        return this;
+    }
+
+    /**
      * Sets the cooldown for this instance of settings. If someone executes a command before the cooldown has expired, it won't be called.
      * @param msCooldown the cooldown in milliseconds.
      * @return The current object. This is to use fluent interface.
@@ -473,11 +485,11 @@ public class CommandSettings {
     /**
      * Sets the color the help message embed will have if you use DefaultHelpCommand.
      * By default, it will always be the color of the self member.
-     * @param color The color to set.
+     * @param color The color to set. To set this to self member color, set it to null.
      * @return The current object. This is to use fluent interface.
      * @see DefaultHelpCommand
      */
-    public CommandSettings setHelpCommandColor(Color color) {
+    public CommandSettings setHelpCommandColor(@Nullable Color color) {
         this.helpColor = color;
         return this;
     }

@@ -9,7 +9,6 @@ import java.util.function.Consumer;
  * This annotation may be used inside of a sub class of AbstractCommand to annotate methods as SubCommand-methods.
  * Methods annotated with this annotation must have the signature {@code void (com.github.johnnyjayjay.commandapi.CommandEvent, net.dv8tion.jda.core.entities.Member, net.dv8tion.jda.core.entities.TextChannel, java.lang.String[])}
  * in order to be registered (you will get a warning if a signature violates that).
- *
  * @author JohnnyJayJay
  * @version 3.2
  * @since 3.2
