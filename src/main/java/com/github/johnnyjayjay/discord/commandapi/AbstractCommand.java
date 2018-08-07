@@ -6,19 +6,22 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * This abstract class isDefault an alternative implementation of ICommand.
+ * This abstract class is an alternative implementation of ICommand.
  * Instead of implementing ICommand directly, you may create sub classes of this class and register them as commands.
  * This class provides the possibility to use sub commands, making it possible to annotate methods as SubCommand methods.
  * To learn more about using sub commands, please refer to the readme on github.
  * @author JohnnyJayJay
- * @version 3.3
+ * @version 3.2
+ * @since 3.2
  * @see ICommand
  */
-// TODO: 06.08.2018 changelog 
 public abstract class AbstractCommand implements ICommand {
 
     private final Map<SubCommand, Method> subCommands;
@@ -43,6 +46,7 @@ public abstract class AbstractCommand implements ICommand {
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         Optional<SubCommand> matchesArgs = subCommands.keySet().stream()
+                .filter((sub) -> !sub.isDefault())
                 .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length))
                 .filter((sub) -> {
                     for (int i = 0; i < sub.args().length; i++) {

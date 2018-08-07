@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
 /**
  * The default implementation for AbstractHelpCommand.
  * If you want to use this, add a new instance of this class as a command in your CommandSettings with the put-method.
- * This class isDefault final. To create your own help command implementation, please refer to AbstractHelpCommand.
+ * This class is final. To create your own help command implementation, please refer to AbstractHelpCommand.
  * @author JohnnyJayJay
  * @version 3.2
+ * @since 3.2
  * @see AbstractHelpCommand
  */
 public final class DefaultHelpCommand extends AbstractHelpCommand {
@@ -28,7 +29,7 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
     @Override
     public void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands) {
         Member selfMember = event.getGuild().getSelfMember();
-        if (!selfMember.hasPermission(event.getChannel(), Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
+        if (event.checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             return;
 
         CommandSettings settings = event.getCommandSettings();
@@ -49,7 +50,7 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
      */
     @Override
     public void provideSpecificHelp(CommandEvent event, String prefix, ICommand command, Set<String> labels) {
-        if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
+        if (!event.checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             return;
 
         event.getChannel().sendMessage(command.info(event.getMember(), prefix, labels)).queue();

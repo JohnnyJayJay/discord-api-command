@@ -13,13 +13,14 @@ import java.awt.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO: 07.08.2018 readme 
 /**
  * To use this framework, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
  * @version 3.2
+ * @since 1.1
  */
-
 public class CommandSettings {
 
     // Regex that only matches valid prefixes
@@ -51,7 +52,7 @@ public class CommandSettings {
 
     private final CommandListener listener;
 
-    private boolean activated; // ...isDefault this instance activated?
+    private boolean activated; // ...is this instance activated?
     private boolean useShardManager;
 
     private boolean labelIgnoreCase;
@@ -60,9 +61,9 @@ public class CommandSettings {
 
 
     /**
-     * This isDefault the optional constructor in case you are sharding your bot.
-     * The parameters are validated automatically. In case of any problems (if the prefix isDefault empty), this will throw a CommandSetException.
-     * @param shardManager Put your active ShardManager here. This isDefault important for the activation of the CommandListener.
+     * This is the optional constructor in case you are sharding your bot.
+     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
+     * @param shardManager Put your active ShardManager here. This is important for the activation of the CommandListener.
      * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
      * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
      *                       "FOO", "FoO" and so on.
@@ -74,9 +75,9 @@ public class CommandSettings {
     }
 
     /**
-     * This isDefault the constructor.
-     * The parameters are validated automatically. In case of any problems (if the prefix isDefault empty), this will throw a CommandSetException.
-     * @param jda Put your active JDA here. This isDefault important for the activation of the CommandListener.
+     * This is the constructor.
+     * The parameters are validated automatically. In case of any problems (if the prefix is empty), this will throw a CommandSetException.
+     * @param jda Put your active JDA here. This is important for the activation of the CommandListener.
      * @param defaultPrefix The String you will have to put before every command in order to get your command execution registered. This can later be changed.
      * @param labelIgnoreCase Set this to true, if you want deactivate case sensitivity for the recognition of labels. E.g.: there will be no difference between the labels "foo",
      *                        "FOO", "FoO" and so on.
@@ -105,9 +106,9 @@ public class CommandSettings {
     /**
      * Method to add one help label.
      * @param label The label to add.
-     * @return The current object. This isDefault to use fluent interface.
-     * @throws CommandSetException if the given label isDefault invalid (contains spaces)
-     * @deprecated This method isDefault deprecated and thus not supported anymore. Help Commands are now registered like any other command,
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if the given label is invalid (contains spaces)
+     * @deprecated This method is deprecated and thus not supported anymore. Help Commands are now registered like any other command,
      * i.e. using CommandSettings#put. To use the default implementation of the help command, register an instance of DefaultHelpCommand.
      * @see DefaultHelpCommand
      */
@@ -124,8 +125,8 @@ public class CommandSettings {
     /**
      * Use this method to add help labels. This will only work if you instantiated this class with the parameter useHelpCommand as true.
      * @param labels One or more labels which may later be called by members to list all commands or to show info about one specific command.
-     * @return The current object. This isDefault to use fluent interface.
-     * @deprecated This method isDefault deprecated and thus not supported anymore. Help Commands are now registered like any other command,
+     * @return The current object. This is to use fluent interface.
+     * @deprecated This method is deprecated and thus not supported anymore. Help Commands are now registered like any other command,
      * i.e. using CommandSettings#put. To use the default implementation of the help command, register an instance of DefaultHelpCommand.
      * @see DefaultHelpCommand
      */
@@ -139,9 +140,9 @@ public class CommandSettings {
     /**
      * Adds multiple labels from a String Set.
      * @param labels A Set which contains the labels you want to add.
-     * @return The current object. This isDefault to use fluent interface.
-     * @throws CommandSetException if one of the labels isDefault not a valid label.
-     * @deprecated  This method isDefault deprecated and thus not supported anymore. Help Commands are now registered like any other command,
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if one of the labels is not a valid label.
+     * @deprecated  This method is deprecated and thus not supported anymore. Help Commands are now registered like any other command,
      * i.e. using CommandSettings#put. To use the default implementation of the help command, register an instance of DefaultHelpCommand.
      * @see DefaultHelpCommand
      */
@@ -155,7 +156,7 @@ public class CommandSettings {
      * This method removes one specific help label from the help label Set.
      * @param label The label to remove.
      * @return true, if the label was successfully removed. False, if not.
-     * @deprecated This method isDefault deprecated and thus not supported anymore. Help commands are now removed like any other command,
+     * @deprecated This method is deprecated and thus not supported anymore. Help commands are now removed like any other command,
      * using CommandSettings#remove.
      */
     @Deprecated
@@ -167,7 +168,7 @@ public class CommandSettings {
      * This can be used to remove some help labels, but not all of them.
      * @param labels The help labels to remove.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
-     * @deprecated This method isDefault deprecated and thus not supported anymore. Help commands are now removed like any other command,
+     * @deprecated This method is deprecated and thus not supported anymore. Help commands are now removed like any other command,
      * using CommandSettings#remove.
      */
     @Deprecated
@@ -185,7 +186,7 @@ public class CommandSettings {
      * Removes all labels from a Set.
      * @param labels The Set of labels that are to be removed.
      * @return true, if every label was successfully removed. false, if one of the given labels does not exist and thus was not removed.
-     * @deprecated This method isDefault deprecated and thus not supported anymore. Help commands are now removed like any other command,
+     * @deprecated This method is deprecated and thus not supported anymore. Help commands are now removed like any other command,
      * using CommandSettings#remove.
      */
     @Deprecated
@@ -195,8 +196,8 @@ public class CommandSettings {
 
     /**
      * This can be used to deactivate the help labels. Removes every help label.
-     * @return The current object. This isDefault to use fluent interface.
-     * @deprecated This method isDefault deprecated and thus not supported anymore. Help commands are now removed like any other command,
+     * @return The current object. This is to use fluent interface.
+     * @deprecated This method is deprecated and thus not supported anymore. Help commands are now removed like any other command,
      * using CommandSettings#remove.
      */
     @Deprecated
@@ -208,7 +209,7 @@ public class CommandSettings {
     /**
      * Adds a given channel to the blacklist (meaning commands can not be executed in there).
      * @param channelId the id of the channel to be blacklisted.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings addChannelToBlacklist(long channelId) {
         this.blacklistedChannels.add(channelId);
@@ -218,7 +219,7 @@ public class CommandSettings {
     /**
      * Adds multiple channels to the blacklist.
      * @param channelIds multiple ids or an array of ids to be added.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings addChannelsToBlacklist(long... channelIds) {
         for (long id : channelIds)
@@ -229,7 +230,7 @@ public class CommandSettings {
     /**
      * Adds multiple channels to the blacklist.
      * @param channelIds A Collection of channel ids to be added.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings addChannelsToBlacklist(Collection<Long> channelIds) {
         this.blacklistedChannels.addAll(channelIds);
@@ -270,8 +271,8 @@ public class CommandSettings {
     }
 
     /**
-     * Clears the blacklist so that no channel isDefault blacklisted anymore.
-     * @return The current object. This isDefault to use fluent interface.
+     * Clears the blacklist so that no channel is blacklisted anymore.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clearBlacklist() {
         this.blacklistedChannels.clear();
@@ -279,19 +280,19 @@ public class CommandSettings {
     }
 
     /**
-     * Use this method to add commands from your project. Every command which isDefault supposed to be active should be added by this.
+     * Use this method to add commands from your project. Every command which is supposed to be active should be added by this.
      * <p>
-     * The two parameters will be put in a HashMap which isDefault used by the API to notice commands.
+     * The two parameters will be put in a HashMap which is used by the API to notice commands.
      * @param label The label which describes your command, i.e. the string after the prefix [prefix][label].
      * @param executor An instance of your command class which implements ICommand.
-     * @return The current object. This isDefault to use fluent interface.
-     * @throws CommandSetException If the label isDefault empty or consists of multiple words.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException If the label is empty or consists of multiple words.
      */
     public CommandSettings put(@Nonnull ICommand executor, String label) {
         if (label.matches(VALID_LABEL))
             this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
-            throw new CommandSetException(INVALID_LABEL_MESSAGE, new IllegalArgumentException("Label " + label + " isDefault not valid"));
+            throw new CommandSetException(INVALID_LABEL_MESSAGE, new IllegalArgumentException("Label " + label + " is not valid"));
 
         return this;
     }
@@ -300,9 +301,9 @@ public class CommandSettings {
      * Use this method to add commands with aliases. <p>
      * Works like put(ICommand, String) but adds multiple labels to the same command.
      * @param executor An instance of your command class which implements ICommand.
-     * @param labels One or more labels. This will throw a CommandSetException, if the label isDefault empty or contains spaces.
-     * @return The current object. This isDefault to use fluent interface.
-     * @throws CommandSetException If one label isDefault empty or consists of multiple words
+     * @param labels One or more labels. This will throw a CommandSetException, if the label is empty or contains spaces.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException If one label is empty or consists of multiple words
      */
     public CommandSettings put(@Nonnull ICommand executor, @Nonnull String... labels) {
         for (String label : labels)
@@ -311,11 +312,11 @@ public class CommandSettings {
     }
 
     /**
-     * Use this method to add commands with aliases from a Set. This isDefault not much different from the put-method with Varargs.
+     * Use this method to add commands with aliases from a Set. This is not much different from the put-method with Varargs.
      * @param executor An instance of your command class which implements ICommand.
-     * @param labels One or more labels. This will throw a CommandSetException, if the label isDefault empty or contains spaces.
-     * @return The current object. This isDefault to use fluent interface.
-     * @throws CommandSetException if one label isDefault empty or contains spaces.
+     * @param labels One or more labels. This will throw a CommandSetException, if the label is empty or contains spaces.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if one label is empty or contains spaces.
      */
     public CommandSettings put(@Nonnull ICommand executor, @Nonnull Collection<String> labels) {
         this.put(executor, labels.toArray(new String[0]));
@@ -346,7 +347,7 @@ public class CommandSettings {
     }
 
     /**
-     * Removes every label that isDefault in the given Collection.
+     * Removes every label that is in the given Collection.
      * @param labels The labels to remove.
      * @return true, if every label was successfully removed. False, if not (e.g. the label didn't exist)
      */
@@ -356,7 +357,7 @@ public class CommandSettings {
 
     /**
      * Clears all commands.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clearCommands() {
         this.commands.clear();
@@ -365,8 +366,8 @@ public class CommandSettings {
 
     /**
      * Resets this whole instance by clearing the commands, help labels and setting everything to how it was at the beginning.
-     * This instance will also be deactivated if it isDefault not already.
-     * @return The current object. This isDefault to use fluent interface.
+     * This instance will also be deactivated if it is not already.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings clear() {
         this.clearBlacklist().clearCommands();
@@ -379,22 +380,22 @@ public class CommandSettings {
 
     /**
      * Use this method to set the default prefix.
-     * @param prefix The prefix to set. In case the given String isDefault empty, this will throw a CommandSetException.
-     * @return The current object. This isDefault to use fluent interface.
+     * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.
+     * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
     public CommandSettings setDefaultPrefix(@Nonnull String prefix) {
         if (prefix.matches(VALID_PREFIX))
             this.defaultPrefix = prefix;
         else
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " isDefault not valid"));
+            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
         return this;
     }
 
     /**
-     * Sets a Message that will be sent in the event of a Member using the prefix without executing any valid command. By default, it isDefault null. If it isDefault null, no Message will be sent.
-     * @param message Nullable Message object that will be wrapped in a new MessageBuilder to prevent the usage of already sent Messages. If this isDefault null, the message isDefault deactivated.
-     * @return The current object. This isDefault to use fluent interface.
+     * Sets a Message that will be sent in the event of a Member using the prefix without executing any valid command. By default, it is null. If it is null, no Message will be sent.
+     * @param message Nullable Message object that will be wrapped in a new MessageBuilder to prevent the usage of already sent Messages. If this is null, the message is deactivated.
+     * @return The current object. This is to use fluent interface.
      * @see MessageBuilder
      */
     public CommandSettings setUnknownCommandMessage(@Nullable Message message) {
@@ -410,12 +411,12 @@ public class CommandSettings {
      * You can remove the custom prefix from a guild by setting its prefix to null.
      * @param guildId The guild id as a long.
      * @param prefix The nullable prefix to be set.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
     public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
         if (prefix != null && !prefix.matches(VALID_PREFIX))
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " isDefault not valid"));
+            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
         this.prefixMap.put(guildId, prefix);
         return this;
     }
@@ -424,21 +425,21 @@ public class CommandSettings {
      * You may use this method as another way to add custom prefixes. This might be useful if you have many guilds to set
      * prefixes for, because this bulk adds the Map parameter.
      * @param guildIdPrefixMap A Map which contains the prefix for each guild to add. Key: guild ID (Long), Value: prefix (String)
-     * @return The current object. This isDefault to use fluent interface.
-     * @throws CommandSetException if one of the prefixes isDefault not valid.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException if one of the prefixes is not valid.
      */
     public CommandSettings setCustomPrefixes(@Nonnull Map<Long, String> guildIdPrefixMap) {
         if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(VALID_PREFIX)))
             prefixMap.putAll(guildIdPrefixMap);
         else
-            throw new CommandSetException("One or more of the prefixes isDefault not valid: " + INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Invalid prefix"));
+            throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Invalid prefix"));
         return this;
     }
 
     /**
      * Sets the cooldown for this instance of settings. If someone executes a command before the cooldown has expired, it won't be called.
      * @param msCooldown the cooldown in milliseconds.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings setCooldown(long msCooldown) {
         this.cooldown = msCooldown;
@@ -447,12 +448,12 @@ public class CommandSettings {
 
     /**
      * Sets the parameter resetCooldown. Should be used in combination with the cooldown function of this API.
-     * By default, this isDefault false.
-     * @param resetCooldown True: The command cooldown isDefault reset on each attempt to execute a command. E.g.:
+     * By default, this is false.
+     * @param resetCooldown True: The command cooldown is reset on each attempt to execute a command. E.g.:
      *                      A User executes an command and gets a 10 second cooldown. If he tries to execute another command within these 10 seconds,
-     *                      the command isn't executed and the cooldown isDefault at 10 seconds again.<p>
-     *                      False: Once the cooldown isDefault activated, it will not be reset by further attempts to execute commands.
-     * @return The current object. This isDefault to use fluent interface.
+     *                      the command isn't executed and the cooldown is at 10 seconds again.<p>
+     *                      False: Once the cooldown is activated, it will not be reset by further attempts to execute commands.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings setResetCooldown(boolean resetCooldown) {
         this.resetCooldown = resetCooldown;
@@ -460,9 +461,9 @@ public class CommandSettings {
     }
 
     /**
-     * Setter for the field botExecution. Decides whether bots may execute commands. By default, this isDefault NOT the case.
+     * Setter for the field botExecution. Decides whether bots may execute commands. By default, this is NOT the case.
      * @param botExecution true, if you want to allow bots to execute commands. false, if not.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      */
     public CommandSettings setBotExecution(boolean botExecution) {
         this.botExecution = botExecution;
@@ -473,7 +474,7 @@ public class CommandSettings {
      * Sets the color the help message embed will have if you use DefaultHelpCommand.
      * By default, it will always be the color of the self member.
      * @param color The color to set.
-     * @return The current object. This isDefault to use fluent interface.
+     * @return The current object. This is to use fluent interface.
      * @see DefaultHelpCommand
      */
     public CommandSettings setHelpCommandColor(Color color) {
@@ -482,9 +483,9 @@ public class CommandSettings {
     }
 
     /**
-     * Sets the prefix and the command HashMap for the rest of the API. This isDefault the last method to call when having finished setting up your commands.<p>
-     * Note that activating multiple CommandSettings may cause problems. You can do this to use multiple prefixes, but it isDefault not recommended.<p>
-     * This method isDefault important to call because otherwise no command will be registered by the internal command listener.
+     * Sets the prefix and the command HashMap for the rest of the API. This is the last method to call when having finished setting up your commands.<p>
+     * Note that activating multiple CommandSettings may cause problems. You can do this to use multiple prefixes, but it is not recommended.<p>
+     * This method is important to call because otherwise no command will be registered by the internal command listener.
      * @throws CommandSetException if you already activated this instance.
      */
     public void activate() {
@@ -519,7 +520,7 @@ public class CommandSettings {
     /**
      * Use this method to get the prefix for a specific guild.
      * @param guildId The id of the guild to check.
-     * @return the default prefix, if there isDefault no custom prefix set for the given guild id. Otherwise, it returns the custom prefix.
+     * @return the default prefix, if there is no custom prefix set for the given guild id. Otherwise, it returns the custom prefix.
      */
     public String getPrefix(long guildId) {
         String prefix = this.prefixMap.get(guildId);
@@ -543,7 +544,7 @@ public class CommandSettings {
     }
 
     /**
-     * Returns whether the given channel id isDefault blacklisted.
+     * Returns whether the given channel id is blacklisted.
      * @param channelId The id of the channel to check for.
      * @return true, if the blacklist Set contains this id. False, if not.
      */
@@ -573,7 +574,7 @@ public class CommandSettings {
     /**
      * Returns all of the registered help labels.
      * @return an unmodifiable Set of Strings that are registered as help labels.
-     * @deprecated This method isDefault deprecated and not supported in this version anymore. It will be removed in a future release.
+     * @deprecated This method is deprecated and not supported in this version anymore. It will be removed in a future release.
      * Help labels can now be retrieved with CommandSettings#getLabels(ICommand).
      */
     @Deprecated
@@ -582,8 +583,8 @@ public class CommandSettings {
     }
 
     /**
-     * Returns whether this instance isDefault activated or not.
-     * @return true, if it isDefault, false, if not.
+     * Returns whether this instance is activated or not.
+     * @return true, if it is, false, if not.
      */
     public boolean isActivated() {
         return this.activated;
@@ -607,7 +608,7 @@ public class CommandSettings {
 
     /**
      * Returns whether command labels are case insensitive on this instance of CommandSettings.
-     * @return true, if ignore case for labels isDefault activated. False, if not.
+     * @return true, if ignore case for labels is activated. False, if not.
      */
     public boolean isLabelIgnoreCase() {
         return this.labelIgnoreCase;
@@ -615,14 +616,14 @@ public class CommandSettings {
 
     /**
      * Returns whether the cooldown will be reset for each execution attempt. See the setter of this for more.
-     * @return True, if the cooldown isDefault reset each time. False, if not.
+     * @return True, if the cooldown is reset each time. False, if not.
      */
     public boolean isResetCooldown() {
         return resetCooldown;
     }
 
     /**
-     * Returns whether bot execution isDefault enabled.
+     * Returns whether bot execution is enabled.
      * @return True, if bots may execute commands. False, if not.
      */
     public boolean botsMayExecute() {

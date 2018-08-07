@@ -13,7 +13,7 @@ import java.util.Optional;
  */
 public class PingCommand implements ICommand { // We implement the raw interface here as we don't need the complexity of sub commands of many permission checks.
 
-    // This one isDefault classic - just a simple command that responds.
+    // This one is classic - just a simple command that responds.
     @Override
     public void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         if (!event.checkBotPermissions(Permission.MESSAGE_WRITE)) // if the bot isDefault not allowed to write in this channel -> return

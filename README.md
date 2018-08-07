@@ -37,27 +37,30 @@ If you use Maven, you can add this library even less complicated: Just add the f
 And that's it!
 
 ## Getting started
-#### ICommand
-Using the CommandAPI is quite easy. All you need to do is writing your own commands, the rest won't concern you.<p>
-Command classes have to implement the interface `ICommand`, which represents a class whose objects are able to execute commands.
+#### Wrting Commands
+Generally speaking, there are two ways to write your own commands.
 
-This interface contains two methods, `void onCommand(CommandEvent, Member, TextChannel, String[])` and `String info(Member)`.
-The first method **must** be implemented. It will be called in case an object of this class is registered as a command executor and its label gets called by a member of a guild 
-the bot is on. So, an example implementation of `ICommand` might look like this:
-
+#### Implementing ICommand directly
+This method is simpler and more performant. If you are seeking high performance, this might be your choice.
+Only classes that implement the interface ICommand are accepted by the `put`-method in `CommandSettings`.
+`ICommand` is also a `FunctionalInterface`, meaning it can be used with lambda expression. This may be useful for temporary commands, which is possible with this framework.
+An implementation of `ICommand` might look like this:
 ```java
 public class PingCommand implements ICommand {
     
-    // Important!
+    private final Message infoMessage = new MessageBuilder().setContent("This command pongs you. Try it out!").build();
+    
+    // Important (must be overwritten)
+    // This command simply responds with "Pong" when it's called
     @Override
     public void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        channel.sendMessage("Pong! " + member.getAsMention()).queue();
+        event.respond("Pong! " + member.getAsMention());
     }
     
     // Optional
     @Override
-    public String info(Member member) {
-        return "This command pongs you. Try it out!";
+    public Message info(Member member, String prefix, Set<String> labels) {
+        return infoMessage;
     }
 }
 ```

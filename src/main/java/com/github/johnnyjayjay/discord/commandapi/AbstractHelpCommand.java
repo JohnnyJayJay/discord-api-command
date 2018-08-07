@@ -13,6 +13,7 @@ import java.util.Set;
  * The framework provides a default implementation of this class, DefaultHelpCommand.
  * @author JohnnyJayJay
  * @version 3.2
+ * @since 3.2
  * @see DefaultHelpCommand
  */
 public abstract class AbstractHelpCommand implements ICommand {
@@ -37,7 +38,7 @@ public abstract class AbstractHelpCommand implements ICommand {
     }
 
     /**
-     * This method isDefault called if someone uses this command with no parameters or doesn't give a valid label as an argument.
+     * This method is called if someone uses this command with no parameters or doesn't give a valid label as an argument.
      * The best use would be to display all commands or provide general help in another way.
      * @param event the CommandEvent as for usual commands.
      * @param prefix The prefix of the guild this command was called on.
@@ -46,7 +47,7 @@ public abstract class AbstractHelpCommand implements ICommand {
     public abstract void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands);
 
     /**
-     * This method isDefault called if someone calls the help command and provides a valid label as the first argument.
+     * This method is called if someone calls the help command and provides a valid label as the first argument.
      * @param event the CommandEvent as for usual commands.
      * @param prefix The prefix of the guild this command was called on.
      * @param command The ICommand that the help was requested for.

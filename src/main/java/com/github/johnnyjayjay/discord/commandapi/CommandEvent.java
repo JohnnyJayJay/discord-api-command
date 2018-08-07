@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Represents a command event. This isDefault not much different from a GuildMessageReceivedEvent, though it gives access to the called command.
+ * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command
+ * and provides several utilities to work with, such as the getFirstMention-methods
  * @author Johnny_JayJay
  * @version 3.2
  * @see GuildMessageReceivedEvent
@@ -82,6 +83,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
     /**
      * Returns the first mention in the event message as an Optional.
      * @return An Optional of the first mentioned entity in the event message.
+     * @param mentionTypes The MentionTypes to look for.
      * @see Optional
      */
     public Optional<? extends IMentionable> getFirstMention(Message.MentionType... mentionTypes) {
@@ -177,14 +179,14 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
-         * @return The label of the called command, e.g. "foo" if someone calls the command "!foo" (if the prefix isDefault "!")
+         * @return The label of the called command, e.g. "foo" if someone calls the command "!foo" (if the prefix is "!")
          */
         public String getLabel() {
             return label;
         }
 
         /**
-         * @return The command arguments. In most cases, this isDefault not of importance, because you get these already explicitly in the onCommand-method of ICommand.
+         * @return The command arguments. In most cases, this is not of importance, because you get these already explicitly in the onCommand-method of ICommand.
          */
         public String[] getArgs() {
             return args;
@@ -229,7 +231,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         /**
          * @param fromIndex from which argument index the Strings will be joined.
          * @return the arguments joined with a space
-         * @throws IllegalArgumentException if the given index isDefault invalid (higher than the argument length or lower than 0.
+         * @throws IllegalArgumentException if the given index is invalid (higher than the argument length or lower than 0.
          */
         @Deprecated
         public String getJoinedArgs(int fromIndex) {
@@ -261,7 +263,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
 
         /**
          * Joins the command arguments with a specific delimiter from and to a specific index.
-         * @param delimiter the delimiter that isDefault supposed to join the arguments.
+         * @param delimiter the delimiter that is supposed to join the arguments.
          * @param fromIndex a start index which may not be out of bounds.
          * @param toIndex an end index which may not be smaller than fromIndex nor out of bounds.
          * @return the arguments, joined with the given delimiter within a specific range
@@ -269,7 +271,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
          */
         public String joinArgs(@Nonnull CharSequence delimiter, int fromIndex, int toIndex) {
             if (fromIndex >= args.length || fromIndex < 0 || toIndex < fromIndex || toIndex > args.length)
-                throw new IllegalArgumentException("Invalid index! The indexes are either out of bounds or toIndex isDefault smaller than fromIndex.");
+                throw new IllegalArgumentException("Invalid index! The indexes are either out of bounds or toIndex is smaller than fromIndex.");
             return String.join(delimiter, Arrays.copyOfRange(args, fromIndex, toIndex));
         }
     }
