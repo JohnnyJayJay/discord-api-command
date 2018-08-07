@@ -12,12 +12,10 @@ public @interface SubCommand {
 
     boolean isDefault() default false;
 
-    String regex() default "";
+    String[] args() default {};
 
-    int argsLength() default -1;
+    boolean moreArgs() default false;
 
     Permission[] botPerms() default {};
-
-    Permission[] memberPerms() default {};
 
 }

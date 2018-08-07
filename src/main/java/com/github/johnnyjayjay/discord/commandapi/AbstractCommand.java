@@ -42,27 +42,36 @@ public abstract class AbstractCommand implements ICommand {
 
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        String joinedArgs = event.getCommandSettings().isLabelIgnoreCase() ? event.getCommand().getJoinedArgs().toLowerCase() : event.getCommand().getJoinedArgs();
-        Member selfMember = event.getGuild().getSelfMember();
-        // FIXME: 06.08.2018 default method is always chosen
-        subCommands.keySet().stream()
-                .filter((sub) -> joinedArgs.matches(sub.regex() + ".*"))
-                .filter((sub) -> sub.argsLength() == args.length || sub.argsLength() == -1)
-                .filter((sub) -> event.checkMemberPermissions(sub.memberPerms()) && event.checkBotPermissions(sub.botPerms())).findFirst()
-                .map(Optional::of).orElseGet(
-                        () -> subCommands.keySet().stream().filter((sub) -> event.checkMemberPermissions(sub.memberPerms()) && event.checkBotPermissions(sub.botPerms())).filter(SubCommand::isDefault).findFirst())
-                .map(subCommands::get).ifPresent((method) -> {
-                    try {
-                        method.invoke(this, event, member, channel, args);
-                    } catch (IllegalAccessException e) {
-                        CommandSettings.LOGGER.error("An Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
-                    } catch (InvocationTargetException e) {
-                        CommandSettings.LOGGER.warn("One of the commands had an uncaught exception:", e.getCause());
-                        e.printStackTrace();
+        Optional<SubCommand> matchesArgs = subCommands.keySet().stream()
+                .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length))
+                .filter((sub) -> {
+                    for (int i = 0; i < sub.args().length; i++) {
+                        if (!args[i].matches(sub.args()[i]))
+                            return false;
                     }
-        });
+                    return true;
+                })
+                .filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst();
+        if (matchesArgs.isPresent()) {
+            this.invokeMethod(subCommands.get(matchesArgs.get()), event, member, channel, args);
+        } else {
+            subCommands.keySet().stream().filter((sub) -> event.checkBotPermissions(sub.botPerms()))
+                    .filter(SubCommand::isDefault).findFirst().map(subCommands::get)
+                    .ifPresent((method) -> this.invokeMethod(method, event, member, channel, args));
+        }
     }
 
+    private void invokeMethod(Method method, CommandEvent event, Member member, TextChannel channel, String[] args) {
+        try {
+            method.invoke(this, event, member, channel, args);
+        } catch (IllegalAccessException e) {
+            CommandSettings.LOGGER.error("An Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
+        } catch (InvocationTargetException e) {
+            CommandSettings.LOGGER.warn("One of the commands had an uncaught exception:", e.getCause());
+        }
+    }
+
+    // algorithm to find the best fitting method for a specified name. Currently it's not used
     /*private Optional<SubCommand> bestMethod(Set<SubCommand> possible, String joinedArgs) {
         Optional<SubCommand> ret = Optional.empty();
         if (possible.size() == 1) {

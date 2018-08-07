@@ -41,7 +41,6 @@ class CommandListener extends ListenerAdapter {
                         cmd.getExecutor().onCommand(new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings),
                                 event.getMember(), channel, cmd.getArgs());
                     } catch (Exception e) {
-                        e.printStackTrace();
                         CommandSettings.LOGGER.warn("One of the commands had an uncaught exception:", e);
                     }
                 } else {
