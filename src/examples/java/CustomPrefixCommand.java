@@ -20,7 +20,8 @@ public class CustomPrefixCommand extends AbstractCommand {
 
     @SubCommand(args = {"get"}, botPerms = {Permission.MESSAGE_WRITE})
     public void getPrefix(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        event.respond("The prefix for this guild is: `" + event.getCommandSettings().getPrefix(event.getGuild().getIdLong()) + "`");
+        CommandSettings settings = event.getCommandSettings();
+        event.respond("The prefix for this guild is: `" + settings.getPrefix(event.getGuild().getIdLong()) + "`\nThe default prefix is: `" + settings.getPrefix() + "`");
     }
 
     @SubCommand(args = {"set", "custom", CommandSettings.VALID_PREFIX}, botPerms = {Permission.MESSAGE_WRITE})
