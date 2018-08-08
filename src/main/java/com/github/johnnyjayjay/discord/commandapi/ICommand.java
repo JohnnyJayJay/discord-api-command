@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * An interface used to describe a command class.
- * In order to use this API, every class which isDefault supposed to execute commands must implement this interface.
+ * In order to use this API, every class which is supposed to execute commands must implement this interface.
  * @author Johnny_JayJay
  * @version 3.2
  * @since 1.1
@@ -19,11 +19,13 @@ import java.util.Set;
 @FunctionalInterface
 public interface ICommand {
 
+    /**
+     * The default info message, which is simply "No info, description or help set for this command". This is returned in {@code Message info(Member, String, Set<String>)} if not overwritten.
+     */
     Message DEFAULT_INFO = new MessageBuilder().setContent("No info, description or help set for this command.").build();
 
     /**
-     * Everything that happens if the command is executed should be written here.
-     * This is also the place for argument handling.
+     * This method is called if someone calls a corresponding command label to this instance, so it works similar to an event method.
      * @param event By this, you are given access to the CommandEvent, in case you want to get its belongings or even modify it.
      * @param member The member who called the command.
      * @param channel The TextChannel in which the command has been called.
@@ -33,9 +35,11 @@ public interface ICommand {
 
     /**
      * In case you are using the automated help command of this API, your command classes should override this method.
+     * @param member The member who requested help.
      * @return By default, this returns "No info, description or help set" which will be displayed if someone demands help for this command. An Override
      * should return info about the command, such as usage, description, permissions, aliases...
-     * <p>This method is deprecated. Please use the other info-method instead as this is no longer supported.
+     * <p>
+     * @deprecated This method is deprecated. Please use the other info-method instead as this is no longer supported.
      */
     @Deprecated
     default String info(Member member) {

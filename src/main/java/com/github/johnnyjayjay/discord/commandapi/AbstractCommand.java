@@ -24,12 +24,24 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCommand implements ICommand {
 
+    /**
+     * A regex to match member mentions.
+     */
     protected final String MEMBER_MENTION = "<@!?\\d+>";
+    /**
+     * A regex to match role mentions.
+     */
     protected final String ROLE_MENTION = "<&\\d+>";
+    /**
+     * A regex to match text channel mentions.
+     */
     protected final String CHANNEL_MENTION = "<#\\d+>";
 
     private final Map<SubCommand, Method> subCommands;
 
+    /**
+     * Iterates over the SubCommand-annotated methods and saves them in a cache.
+     */
     protected AbstractCommand() {
         // This has to be changed as soon as onCommand changes
         final Class<?>[] parameterTypes = {CommandEvent.class, Member.class, TextChannel.class, String[].class};
@@ -47,6 +59,12 @@ public abstract class AbstractCommand implements ICommand {
         }
     }
 
+    /**
+     * This overrides the method declared in {@link com.github.johnnyjayjay.discord.commandapi.ICommand ICommand}. It is final, thus it may not be overwritten.
+     * To define own command methods in a sub class of this class, refer to the {@link com.github.johnnyjayjay.discord.commandapi.SubCommand SubCommand-annotation}.<br>
+     * See the examples and the readme on github for further information.
+     * @see SubCommand
+     */
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         CommandSettings settings = event.getCommandSettings();

@@ -74,6 +74,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
     }
 
     /**
+     * Returns the arguments of the command.
      * @return the arguments of the command that has been executed.
      */
     public String[] getArgs() {
@@ -179,6 +180,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the label of the command.
          * @return The label of the called command, e.g. "foo" if someone calls the command "!foo" (if the prefix is "!")
          */
         public String getLabel() {
@@ -186,6 +188,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the arguments of the command.
          * @return The command arguments. In most cases, this is not of importance, because you get these already explicitly in the onCommand-method of ICommand.
          */
         public String[] getArgs() {
@@ -193,6 +196,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the {@code ICommand} instance that executed this command.
          * @return The object that calls the onCommand-method. Might be useful in some special cases.
          */
         public ICommand getExecutor() {
@@ -200,6 +204,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the raw content of the event message.
          * @return The raw Message that can also be retrieved with CommandEvent#getMessage#getContentRaw
          */
         public String getRawMessage() {
@@ -215,6 +220,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the command arguments not as an array, but as a List.
          * @return the arguments as an immutable List
          */
         public List<String> getArgsAsList() {
@@ -222,6 +228,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the arguments as a single String.
          * @return the arguments joined with a space
          */
         public String getJoinedArgs() {
@@ -229,9 +236,11 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         }
 
         /**
+         * Returns the arguments as a single String.
          * @param fromIndex from which argument index the Strings will be joined.
          * @return the arguments joined with a space
          * @throws IllegalArgumentException if the given index is invalid (higher than the argument length or lower than 0.
+         * @deprecated This method was deprecated and replaced by CommandEvent.Command#joinArgs.
          */
         @Deprecated
         public String getJoinedArgs(int fromIndex) {

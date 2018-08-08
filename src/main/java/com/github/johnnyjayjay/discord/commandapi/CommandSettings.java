@@ -23,14 +23,20 @@ import java.util.stream.Collectors;
  */
 public class CommandSettings {
 
-    // Regex that only matches valid prefixes
+    /**
+     * A regex that only matches valid prefixes. Can be used to check user input.
+     */
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
-    // Regex that only matches valid command labels
+    /**
+     * A regex that only matches valid labels. Can be used to check user input.
+     */
     public static final String VALID_LABEL = "[^\\s]+";
 
     // TODO: 05.08.2018 illegal prefix characters
 
-    // Logger
+    /**
+     * The logger of this framework. This is protected.
+     */
     protected static final Logger LOGGER = LoggerFactory.getLogger("CommandAPI");
     
     private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
@@ -576,7 +582,7 @@ public class CommandSettings {
     /**
      * Returns every registered label for an ICommand instance in an immutable Set. Note that in case you activated isLabelIgnoreCase, every label in there will be in lower case.
      * Adding or removing something will not have any effect. This can primarily be used to get a command's aliases.
-     * @param command The ICommand instance to get the labels from
+     * @param command The {@link com.github.johnnyjayjay.discord.commandapi.ICommand ICommand} instance to get the labels from
      * @return an unmodifiable Set of labels.
      */
     public Set<String> getLabels(ICommand command) {
@@ -642,6 +648,10 @@ public class CommandSettings {
         return this.botExecution;
     }
 
+    /**
+     * Transforms this instance to a String, showing the current set options.
+     * @return This instance as a String.
+     */
     @Override
     public String toString() {
         return "CommandSettings{" +
