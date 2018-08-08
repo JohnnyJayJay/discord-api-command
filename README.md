@@ -1,8 +1,8 @@
 # discord-api-command
 **A simple Command API for the JDA**
 
-*CURRENT VERSION: *****<p>
-*Other versions: ***3.1,**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0***<br>
+*CURRENT VERSION: ***3.2***<p>
+*Other versions: ***3.1**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0***<br>
 **[Changelog](https://github.com/JohnnyJayJay/discord-api-command/blob/master/changelog.md)**
 
 ## Features:
@@ -17,7 +17,7 @@
 - error transparency through `CommandSetException`
 
 ## On how to add this to your project
-#### Adding as a library
+### Adding as a library
 You can download the .jar-file in [this directory](https://github.com/JohnnyJayJay/discord-api-command/tree/master/builds) and add it to the project
  by performing the following steps:
  1. Create a new directory in your project folder
@@ -25,7 +25,7 @@ You can download the .jar-file in [this directory](https://github.com/JohnnyJayJ
  3. Eclipse: Right-click the jar: `Build Path -> Add To Build Path` <p> IntelliJ: Right-click the jar: `Add As Library`
  4. Done. You can now use it.
  
-#### Adding Dependency in pom
+### Adding Dependency in pom
 If you use Maven, you can add this library even less complicated: Just add the following dependency in your `pom.xml`:
 ```xml
 <dependency>
@@ -37,10 +37,10 @@ If you use Maven, you can add this library even less complicated: Just add the f
 And that's it!
 
 ## Getting started
-#### Wrting Commands
+### Wrting Commands
 Generally speaking, there are two ways to write your own commands.
 
-##### Implementing ICommand directly
+#### Implementing ICommand directly
 This method is simpler and more performant. If you are seeking high performance, this might be your choice.
 Only classes that implement the interface ICommand are accepted by the `put`-method in `CommandSettings`.
 `ICommand` is also a `FunctionalInterface`, meaning it can be used with lambda expression. This may be useful for temporary commands, which is possible with this framework.
@@ -65,7 +65,7 @@ public class PingCommand implements ICommand {
 }
 ```
 
-##### Extending AbstractCommand
+#### Extending AbstractCommand
 The other way to create a command is making a sub class of `AbstractCommand`. This provides you with more possibilities, though it is less performant.
 The main reason why you should rather use `AbstractCommand` than `ICommand` is readability and less confusion, mainly for big commands.<br>
 `AbstractCommand` supports the sub command system, meaning you may have multiple methods for different kinds of command execution. 
@@ -133,7 +133,7 @@ As you can see, almost every SubCommand has an argument called `args`. You may h
 `this.MEMBER_MENTION` is a `protected final String` from `AbstractCommand` that may be used as a regex for member mentions. There's also a regex for role mentions and channel mentions.<br>
 The regular expressions in the args-array will get a case insensitivity flag if `labelIgnoreCase` in `CommandSettings` is true. If it isn't, the arguments will be case sensitive (unless you flag them yourself, of course).
 
-#### CommandSettings
+### CommandSettings
 Now, just creating an `ICommand` class won't do much - actually, nothing at all.
 Imagine we want to have this command registered. This would perhaps look like this:
 ```java
@@ -154,7 +154,7 @@ In this case, someone could write `!ping` in a channel the bot is also in and th
 This person could also type `!pingpong` or `!p`. These are aliases.<br>
 `CommandSettings` has a lot of other useful methods. Make sure to check the docs for more.
 
-#### Using help commands
+### Using help commands
 This framework provides a template and a default implementation for help commands.
 You are not forced to use it, though it can be a useful tool for common help commands.<br>
 To use the default implementation, register an instance of `DefaultHelpCommand` as a command.
@@ -175,7 +175,7 @@ public class HelpCommand extends AbstractHelpCommand {
 ```
 You may register this now like any other command.
 
-#### Other features
+### Other features
 This API has supported guild-custom prefixes for some time now. By using `CommandSettings#setCustomPrefix` you can associate a prefix to a specific guild (or `CommandSettings#setCustomPrefixes` for bulk addition). 
 Though it is important to know that this is only saved temporarily, meaning as long as the program runs. If you want to apply changes like this permanently, you have to keep track of that manually.
 I am currently not planning to add any database integration. 
@@ -189,7 +189,7 @@ There are a few more features to `CommandSettings`, such as:
 - Setting a command cooldown (and specifying whether the cooldown should be reset on each execution attempt)
 - Setting a Color for `DefaultHelpCommand`
 
-#### Exceptions
+### Exceptions
 This API should only throw one kind of exception, `CommandSetException` (except for explicitly thrown `IllegalArgumentException`s). 
 If this is **NOT** the case and you get another exception thrown by anything inside the API you don't have control over, [please report this here](https://github.com/JohnnyJayJay/discord-api-command/issues).
 
