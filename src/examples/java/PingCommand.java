@@ -8,18 +8,17 @@ import net.dv8tion.jda.core.entities.User;
 import java.util.Optional;
 
 /**
- * @author Johnny_JayJay
- * @version 0.1-SNAPSHOT
+ * This is a simple ICommand implementation example
  */
-public class PingCommand implements ICommand { // We implement the raw interface here as we don't need the complexity of sub commands of many permission checks.
+public class PingCommand implements ICommand { // We implement the raw interface here as we don't need the complexity of sub commands or many permission checks.
 
     // This one is classic - just a simple command that responds.
     @Override
     public void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        if (!event.checkBotPermissions(Permission.MESSAGE_WRITE)) // if the bot isDefault not allowed to write in this channel -> return
+        if (!event.checkBotPermissions(Permission.MESSAGE_WRITE)) // if the bot is not allowed to write in this channel -> return
             return;
 
-        // if a mention isDefault present, send a different message
+        // if a mention is present, send a different message
         Optional<User> firstUserMention = event.getFirstUserMention();
 
         if (firstUserMention.isPresent()) {

@@ -7,10 +7,9 @@ import net.dv8tion.jda.core.JDABuilder;
 import javax.security.auth.login.LoginException;
 
 /**
- * @author Johnny_JayJay
- * @version 0.1-SNAPSHOT
+ * Exemplary main class
  */
-// TODO: 04.08.2018 Write proper examples that make sense 
+// TODO: 04.08.2018 Write proper examples that make sense
 public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException {

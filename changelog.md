@@ -23,6 +23,7 @@
 - Added class `AbstractCommand` with sub command system
 - Added configurable unknown command message
 - Made certain getters of `CommandSettings` public
+- Improved documentation and readme
 
 ### 3.1
 - Changed setCooldown-method's return to `this`

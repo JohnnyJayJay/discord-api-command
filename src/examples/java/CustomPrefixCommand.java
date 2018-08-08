@@ -7,8 +7,7 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 /**
- * @author Johnny_JayJay
- * @version 0.1-SNAPSHOT
+ * This is a sub command example
  */
 public class CustomPrefixCommand extends AbstractCommand {
 

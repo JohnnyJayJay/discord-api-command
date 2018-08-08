@@ -26,7 +26,7 @@ public interface ICommand {
 
     /**
      * This method is called if someone calls a corresponding command label to this instance, so it works similar to an event method.
-     * @param event By this, you are given access to the CommandEvent, in case you want to get its belongings or even modify it.
+     * @param event The {@link com.github.johnnyjayjay.discord.commandapi.CommandEvent CommandEvent} instance for this execution.
      * @param member The member who called the command.
      * @param channel The TextChannel in which the command has been called.
      * @param args The command arguments, i.e. everything behind the label ([prefix][label] [arg1] [arg2]...)

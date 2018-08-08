@@ -18,7 +18,12 @@ import java.util.Set;
  */
 public abstract class AbstractHelpCommand implements ICommand {
 
-    
+    /**
+     * This overwrites the method {@code onCommand} from {@link com.github.johnnyjayjay.discord.commandapi.ICommand ICommand}.
+     * It parses the command and decides whether {@code provideGeneralHelp} or {@code provideSpecificHelp} will be called.<br>
+     * This method is final. To make your own implementation of {@link com.github.johnnyjayjay.discord.commandapi.ICommand ICommand},
+     * you have to implement this interface on your own.
+     */
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         CommandSettings settings = event.getCommandSettings();
