@@ -6,3 +6,4 @@ jdk:
 - oraclejdk10
 
 script: mvn clean test
+
