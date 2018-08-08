@@ -75,7 +75,7 @@ You want to have a report-command, which has multiple options:<br>
 2. Get the reports of a member (!report get @Member)
 3. Remove all reports from a member (!report remove @Member)
 4. Get your own reports (!report)
-With `ICommand`, it would probably look like this:
+<br>With `ICommand`, it would probably look like this:
 ```java
 public class ReportCommand implements ICommand {
     
@@ -135,7 +135,7 @@ The regular expressions in the args-array will get a case insensitivity flag if 
 
 ### CommandSettings
 Now, just creating an `ICommand` class won't do much - actually, nothing at all.
-Imagine we want to have this command registered. This would perhaps look like this:
+Imagine we want to have this Ping Command registered. This would perhaps look like this:
 ```java
 public class Bot {
     public void start() {

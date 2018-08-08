@@ -9,7 +9,7 @@ import javax.security.auth.login.LoginException;
 /**
  * Exemplary main class
  */
-// TODO: 04.08.2018 Write proper examples that make sense
+// TODO: 04.08.2018 Write more examples
 public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException {
