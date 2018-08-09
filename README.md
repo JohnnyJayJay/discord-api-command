@@ -1,9 +1,10 @@
 # discord-api-command
 **A simple Command API for the JDA**
 
-*CURRENT VERSION: ***3.2***<p>
-*Other versions: ***3.1**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0***<br>
-**[Changelog](https://github.com/JohnnyJayJay/discord-api-command/blob/master/changelog.md)**
+CURRENT VERSION:  **3.2** <p>
+Other versions:  **3.1**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0** <p>
+**[Changelog](https://github.com/JohnnyJayJay/discord-api-command/blob/master/changelog.md)**<br>
+**[Documentation](http://docs.johnnyjayjay.me)**
 
 ## Features:
 - easy command implementation
