@@ -1,5 +1,11 @@
 # Changelog
 
+### next patch
+- Increased performance of CommandListener slightly
+- Added configurable Predicate to `CommandSettings` which tests an event before execution. This may be useful for own checks that are not provided by this framework
+- Added configurable Message that is sent in case someone is on cooldown
+- Added possibility to configure a custom thread pool
+
 ### 3.2
 - Updated to JDA version 3.7.1_387
 - Adjusted cooldown system: it is now configurable whether the cooldown will reset for each command execution attempt

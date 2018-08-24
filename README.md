@@ -17,6 +17,10 @@ Other versions:  **3.1**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0** <p>
 - prevention of exceptions and errors by substantial validation and exception handling
 - error transparency through `CommandSetException`
 
+## Important 
+This library **requires** an SLF4J implementation and does not provide an own implementation like JDA. Without it, you will not get any logging messages, including
+stack traces, information about CommandSettings, warnings and much more.
+
 ## On how to add this to your project
 ### Adding as a library
 You can download the .jar-file in [this directory](https://github.com/JohnnyJayJay/discord-api-command/tree/master/builds) and add it to the project

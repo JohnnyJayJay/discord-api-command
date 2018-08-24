@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -47,9 +51,12 @@ public class CommandSettings {
     private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
 
     private Message unknownCommandMessage;
+    private Message cooldownMessage;
     private String defaultPrefix;
     private long cooldown;
     private Color helpColor;
+    private Predicate<CommandEvent> check;
+    private ExecutorService executorService;
 
     private final Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
     @Deprecated
@@ -111,6 +118,8 @@ public class CommandSettings {
         this.helpLabels = new HashSet<>();
         this.blacklistedChannels = new HashSet<>();
         this.prefixMap = new HashMap<>();
+        this.check = (e) -> true;
+        this.executorService = Executors.newSingleThreadExecutor();
     }
 
     /**
@@ -213,6 +222,21 @@ public class CommandSettings {
     @Deprecated
     public CommandSettings clearHelpLabels() {
         this.helpLabels.clear();
+        return this;
+    }
+
+    /**
+     * Creates the ExecutorService for this framework with the provided pool size. This may, of course, increase performance.
+     * By default, this framework uses only one thread to execute commands.
+     * @param threadPoolSize The size of the thread pool to use.
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException If the provided size is <= 0.
+     */
+    public CommandSettings useFixedThreadPoolSize(int threadPoolSize) {
+        if (threadPoolSize <= 0)
+            throw new CommandSetException("Provided thread pool size is invalid", new IllegalArgumentException("Thread pool size must not be <= 0"));
+
+        this.executorService = Executors.newFixedThreadPool(threadPoolSize);
         return this;
     }
 
@@ -386,8 +410,20 @@ public class CommandSettings {
         this.cooldown = 0;
         this.helpColor = null;
         this.resetCooldown = false;
+        this.check = (e) -> true;
         if (this.activated)
             this.deactivate();
+        return this;
+    }
+
+    /**
+     * Sets a Predicate that tests every CommandEvent before executing it. This may be useful für own cooldown implementations and such.
+     * By default, this Predicate always returns true.
+     * @param check The Predicate to use as a check.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings setCheck(@Nonnull Predicate<CommandEvent> check) {
+        this.check = check;
         return this;
     }
 
@@ -479,6 +515,22 @@ public class CommandSettings {
      */
     public CommandSettings setResetCooldown(boolean resetCooldown) {
         this.resetCooldown = resetCooldown;
+        return this;
+    }
+
+    /**
+     * Sets a message that will be sent in case someone is on cooldown. Generally speaking, it is rather recommended to use your own cooldown
+     * implementation for specific cases like that. Still, it is possible.
+     * Setting this to null removes the message. Nothing will be sent then.
+     * @param message Nullable Message object that will be wrapped in a new MessageBuilder to prevent the usage of already sent Messages. If this is null, the message is deactivated.
+     * @return The current object. This is to use fluent interface.
+     * @see MessageBuilder
+     */
+    public CommandSettings setCooldownMessage(@Nullable Message message) {
+        if (message == null)
+            this.cooldownMessage = null;
+        else
+            this.cooldownMessage = new MessageBuilder(message).build();
         return this;
     }
 
@@ -675,6 +727,18 @@ public class CommandSettings {
 
     protected Message getUnknownCommandMessage() {
         return unknownCommandMessage;
+    }
+
+    protected Message getCooldownMessage() {
+        return cooldownMessage;
+    }
+
+    protected boolean mayCall(CommandEvent event) {
+        return check.test(event);
+    }
+
+    protected void execute(Runnable command) {
+        executorService.execute(command);
     }
 
     protected Map<String, ICommand> getCommands() {

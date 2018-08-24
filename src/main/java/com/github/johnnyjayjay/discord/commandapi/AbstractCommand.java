@@ -84,8 +84,8 @@ public abstract class AbstractCommand implements ICommand {
         if (matchesArgs.isPresent()) {
             this.invokeMethod(subCommands.get(matchesArgs.get()), event, member, channel, args);
         } else {
-            subCommands.keySet().stream().filter((sub) -> event.checkBotPermissions(sub.botPerms()))
-                    .filter(SubCommand::isDefault).findFirst().map(subCommands::get)
+            subCommands.keySet().stream().filter(SubCommand::isDefault).filter((sub) -> event.checkBotPermissions(sub.botPerms()))
+                    .findFirst().map(subCommands::get)
                     .ifPresent((method) -> this.invokeMethod(method, event, member, channel, args));
         }
     }
@@ -94,9 +94,9 @@ public abstract class AbstractCommand implements ICommand {
         try {
             method.invoke(this, event, member, channel, args);
         } catch (IllegalAccessException e) {
-            CommandSettings.LOGGER.error("An Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
+            CommandSettings.LOGGER.error("An unexpected Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
         } catch (InvocationTargetException e) {
-            CommandSettings.LOGGER.warn("One of the commands had an uncaught exception:", e.getCause());
+            CommandSettings.LOGGER.warn("Command " + event.getCommand().getExecutor().getClass().getName() + " had an uncaught Exception in SubCommand " + method.getName() + ":", e.getCause());
         }
     }
 

@@ -39,7 +39,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @param msg The message to respond with as a String.
      */
     public void respond(String msg) {
-        if (checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
+        if (checkBotPermissions(Permission.MESSAGE_WRITE))
             this.getChannel().sendMessage(msg).queue();
     }
 
