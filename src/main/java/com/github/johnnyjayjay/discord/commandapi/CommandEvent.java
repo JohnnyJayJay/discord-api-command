@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: 31.08.2018 GenericCommandEvent, CommandFailureEvent (mit reason), CommandOnCooldownEvent, CommandUnknownEvent 
 /**
  * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command
  * and provides several utilities to work with, such as the getFirstMention-methods
