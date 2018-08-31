@@ -18,10 +18,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+// TODO: 31.08.2018 Exceptions besser regeln
 /**
  * To use this framework, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
@@ -56,6 +58,7 @@ public class CommandSettings {
     private long cooldown;
     private Color helpColor;
     private Predicate<CommandEvent> check;
+    private Consumer<CommandEvent> unknownCommand;
     private ExecutorService executorService;
 
     private final Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
@@ -119,6 +122,7 @@ public class CommandSettings {
         this.blacklistedChannels = new HashSet<>();
         this.prefixMap = new HashMap<>();
         this.check = (e) -> true;
+        this.unknownCommand = (e) -> {};
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -232,7 +236,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException If the provided size is <= 0.
      */
-    public CommandSettings useFixedThreadPoolSize(int threadPoolSize) {
+    public CommandSettings useMultiThreading(int threadPoolSize) {
         if (threadPoolSize <= 0)
             throw new CommandSetException("Provided thread pool size is invalid", new IllegalArgumentException("Thread pool size must not be <= 0"));
 
@@ -518,6 +522,15 @@ public class CommandSettings {
         return this;
     }
 
+    // TODO: 31.08.2018  
+    public CommandSettings onUnknownCommand(Consumer<CommandEvent> consumer) {
+        return this;
+    }
+
+    public CommandSettings onCooldownInvokeAttempt(BiConsumer<CommandEvent, Long> consumer) {
+        return this;
+    }
+
     /**
      * Sets a message that will be sent in case someone is on cooldown. Generally speaking, it is rather recommended to use your own cooldown
      * implementation for specific cases like that. Still, it is possible.
@@ -723,6 +736,15 @@ public class CommandSettings {
                 ", resetCooldown=" + resetCooldown +
                 ", botExecution=" + botExecution +
                 '}';
+    }
+
+    // TODO: 31.08.2018  
+    protected void onUnknownCommand(CommandEvent event) {
+        this.unknownCommand.accept(event);
+    }
+
+    protected void onCooldownExecutionAttempt(CommandEvent event, long cooldown) {
+
     }
 
     protected Message getUnknownCommandMessage() {

@@ -155,7 +155,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * Describes an executed Command. <p>
      * Is used to parse a message which seems to be a command.
      * @author Johnny_JayJay
-     * @version 3.1_1
+     * @version 3.2
      */
     public static class Command {
 
@@ -163,25 +163,28 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         private final String joinedArgs;
         private final String rawArgs;
         private final String rawMessage;
+        private final String prefix;
         private final String label;
         private final String[] args;
 
+        // TODO: 31.08.2018 performanteste und best accessible methode finden
         private Command(String raw, String prefix, CommandSettings settings) {
             String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
             this.label = settings.isLabelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];;
-            if (!settings.getCommands().containsKey(this.label)) {
-                this.command = null;
-                this.joinedArgs = null;
-                this.rawMessage = null;
-                this.rawArgs = null;
-                this.args = null;
-            } else {
-                this.command = settings.getCommands().get(this.label);
-                this.rawMessage = raw;
-                this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
-                this.joinedArgs = String.join(" ", this.args);
-                this.rawArgs = raw.replaceFirst(prefix + this.label + "\\s+", "");
-            }
+            this.command = settings.getCommands().getOrDefault(this.label, null);
+            this.rawMessage = raw;
+            this.prefix = prefix;
+            this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
+            this.joinedArgs = String.join(" ", this.args);
+            this.rawArgs = raw.replaceFirst(prefix + this.label + "\\s+", "");
+        }
+
+        /**
+         * Returns the prefix used to call this command.
+         * @return The prefix.
+         */
+        public String getPrefix() {
+            return prefix;
         }
 
         /**

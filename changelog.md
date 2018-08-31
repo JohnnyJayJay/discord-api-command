@@ -5,6 +5,9 @@
 - Added configurable Predicate to `CommandSettings` which tests an event before execution. This may be useful for own checks that are not provided by this framework
 - Added configurable Message that is sent in case someone is on cooldown
 - Added possibility to configure a custom thread pool
+- Added Regex util class (mainly for `AbstractCommand`)
+- Added `CommandEvent.Command#getPrefix()`
+- Changed Command parsing
 
 ### 3.2
 - Updated to JDA version 3.7.1_387
