@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCommand implements ICommand {
 
+    // TODO: 03.10.2018 Regexes? 
     /**
      * A regex to match member mentions.
      */
@@ -70,7 +71,7 @@ public abstract class AbstractCommand implements ICommand {
         CommandSettings settings = event.getCommandSettings();
         Optional<SubCommand> matchesArgs = subCommands.keySet().stream()
                 .filter((sub) -> !sub.isDefault())
-                .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length))
+                .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length)) // FIXME: 03.10.2018 
                 .filter((sub) -> {
                     String regex;
                     for (int i = 0; i < sub.args().length; i++) {

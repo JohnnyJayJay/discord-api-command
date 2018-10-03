@@ -26,6 +26,7 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
     /**
      * Lists all commands along with the information that more help can be received by adding the optional label parameter.
      */
+    // FIXME: 03.10.2018 geht aktuell nicht
     @Override
     public void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands) {
         Member selfMember = event.getGuild().getSelfMember();

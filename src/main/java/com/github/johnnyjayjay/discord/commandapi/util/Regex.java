@@ -6,6 +6,8 @@ package com.github.johnnyjayjay.discord.commandapi.util;
  */
 public class Regex {
 
+    // TODO: 03.10.2018 was passiert hiermit?
+
     public static final String MEMBER_MENTION = "<@!?\\d+>";
     public static final String CHANNEL_MENTION = "<#\\d+>";
     public static final String ROLE_MENTION = "<&\\d+>";

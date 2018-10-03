@@ -108,6 +108,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @return An Optional of the first mentioned Member in the event message.
      * @see Optional
      */
+    @SuppressWarnings("unchecked")
     public Optional<User> getFirstUserMention() {
         return (Optional<User>) getFirstMention(Message.MentionType.USER);
     }
@@ -117,6 +118,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @return An Optional of the first mentioned Role in the event message.
      * @see Optional
      */
+    @SuppressWarnings("unchecked")
     public Optional<Role> getFirstRoleMention() {
         return (Optional<Role>) getFirstMention(Message.MentionType.ROLE);
     }
@@ -126,6 +128,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @return An Optional of the first mentioned TextChannel in the event message.
      * @see Optional
      */
+    @SuppressWarnings("unchecked")
     public Optional<TextChannel> getFirstChannelMention() {
         return (Optional<TextChannel>) getFirstMention(Message.MentionType.CHANNEL);
     }

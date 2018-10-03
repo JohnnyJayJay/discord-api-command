@@ -58,7 +58,8 @@ public class CommandSettings {
     private long cooldown;
     private Color helpColor;
     private Predicate<CommandEvent> check;
-    private Consumer<CommandEvent> unknownCommand;
+    private Consumer<CommandEvent> unknownCommandHandler;
+    private BiConsumer<CommandEvent, Throwable> exceptionHandler;
     private ExecutorService executorService;
 
     private final Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
@@ -122,8 +123,8 @@ public class CommandSettings {
         this.blacklistedChannels = new HashSet<>();
         this.prefixMap = new HashMap<>();
         this.check = (e) -> true;
-        this.unknownCommand = (e) -> {};
-        this.executorService = Executors.newSingleThreadExecutor();
+        this.unknownCommandHandler = (e) -> {};
+        this.executorService = null;
     }
 
     /**
@@ -232,15 +233,19 @@ public class CommandSettings {
     /**
      * Creates the ExecutorService for this framework with the provided pool size. This may, of course, increase performance.
      * By default, this framework uses only one thread to execute commands.
-     * @param threadPoolSize The size of the thread pool to use.
+     * @param executorService The ExecutorService that should provide threads
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException If the provided size is <= 0.
      */
-    public CommandSettings useMultiThreading(int threadPoolSize) {
-        if (threadPoolSize <= 0)
-            throw new CommandSetException("Provided thread pool size is invalid", new IllegalArgumentException("Thread pool size must not be <= 0"));
+    public CommandSettings useMultiThreading(@Nullable ExecutorService executorService) {
+        if (executorService == null) {
+            this.executorService = null;
+        } else {
+            if (executorService.isShutdown())
+                throw new CommandSetException("Provided ExecutorService is invalid", new IllegalArgumentException("ExecutorService must not be shut down"));
 
-        this.executorService = Executors.newFixedThreadPool(threadPoolSize);
+            this.executorService = executorService;
+        }
         return this;
     }
 
@@ -452,10 +457,7 @@ public class CommandSettings {
      * @see MessageBuilder
      */
     public CommandSettings setUnknownCommandMessage(@Nullable Message message) {
-        if (message == null)
-            this.unknownCommandMessage = null;
-        else
-            this.unknownCommandMessage = new MessageBuilder(message).build();
+        this.unknownCommandMessage = message == null ? null : new MessageBuilder(message).build();
         return this;
     }
 
@@ -522,12 +524,24 @@ public class CommandSettings {
         return this;
     }
 
-    // TODO: 31.08.2018  
-    public CommandSettings onUnknownCommand(Consumer<CommandEvent> consumer) {
+
+    /**
+     * Sets a Consumer that will accept any command execution attempt in which the command label is unknown.
+     * @param action a Consumer that takes the event.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings onUnknownCommand(Consumer<CommandEvent> action) {
+        this.unknownCommandHandler = action;
         return this;
     }
 
-    public CommandSettings onCooldownInvokeAttempt(BiConsumer<CommandEvent, Long> consumer) {
+    /**
+     * Sets a BiConsumer that will accept any command execution attempt in which an uncaught Exception occurs.
+     * @param action a BiConsumer that takes the event and the corresponding Throwable that had been thrown.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings onException(BiConsumer<CommandEvent, Throwable> action) {
+        this.exceptionHandler = action;
         return this;
     }
 
@@ -738,13 +752,13 @@ public class CommandSettings {
                 '}';
     }
 
-    // TODO: 31.08.2018  
+
     protected void onUnknownCommand(CommandEvent event) {
-        this.unknownCommand.accept(event);
+        this.unknownCommandHandler.accept(event);
     }
 
-    protected void onCooldownExecutionAttempt(CommandEvent event, long cooldown) {
-
+    protected void onException(CommandEvent event, Throwable throwable) {
+        this.exceptionHandler.accept(event, throwable);
     }
 
     protected Message getUnknownCommandMessage() {
@@ -760,7 +774,10 @@ public class CommandSettings {
     }
 
     protected void execute(Runnable command) {
-        executorService.execute(command);
+        if (executorService != null)
+            executorService.execute(command);
+        else
+            command.run(); // is das gut? keine ahnung
     }
 
     protected Map<String, ICommand> getCommands() {

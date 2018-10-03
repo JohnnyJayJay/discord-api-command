@@ -39,8 +39,8 @@ public @interface SubCommand {
     String[] args() default {};
 
     /**
-     * A boolean that indicates that there must be more arguments than specified in args in order to be triggered.
-     * This might be useful for commands with an open argument length. If this is set to true, the command argument length must be greater than SubCommand#args().length.
+     * A boolean that indicates that there may be more arguments than specified in args in order to be triggered.
+     * This might be useful for commands with an open argument length. If this is set to true, the command argument length must be equal to or greater than SubCommand#args().length.
      * This is ignored if specified in an isDefault-SubCommand.
      * @return false by default.
      */
