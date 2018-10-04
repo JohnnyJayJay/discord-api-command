@@ -34,5 +34,7 @@
  * {@link com.github.johnnyjayjay.discord.commandapi.CommandSetException CommandSetException} is a {@code RuntimeException} that is thrown in case of any problems with {@link com.github.johnnyjayjay.discord.commandapi.CommandSettings CommandSettings}.
  * <p>
  * Please read the readme on github and take a look at the examples to see how it works.<br>I will give this documentation a revision in the future to provide more examples and helpful code.
+ * <p>
+ * https://www.github.com/JohnnyJayJay
  */
 package com.github.johnnyjayjay.discord.commandapi;

@@ -24,20 +24,6 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCommand implements ICommand {
 
-    // TODO: 03.10.2018 Regexes? 
-    /**
-     * A regex to match member mentions.
-     */
-    protected final String MEMBER_MENTION = "<@!?\\d+>";
-    /**
-     * A regex to match role mentions.
-     */
-    protected final String ROLE_MENTION = "<&\\d+>";
-    /**
-     * A regex to match text channel mentions.
-     */
-    protected final String CHANNEL_MENTION = "<#\\d+>";
-
     private final Map<SubCommand, Method> subCommands;
 
     /**
@@ -69,9 +55,9 @@ public abstract class AbstractCommand implements ICommand {
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         CommandSettings settings = event.getCommandSettings();
-        Optional<SubCommand> matchesArgs = subCommands.keySet().stream()
+        subCommands.keySet().stream()
                 .filter((sub) -> !sub.isDefault())
-                .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length)) // FIXME: 03.10.2018 
+                .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length))
                 .filter((sub) -> {
                     String regex;
                     for (int i = 0; i < sub.args().length; i++) {
@@ -81,14 +67,16 @@ public abstract class AbstractCommand implements ICommand {
                     }
                     return true;
                 })
-                .filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst();
-        if (matchesArgs.isPresent()) {
+                .filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst().map(Optional::of)
+                .orElseGet(() -> subCommands.keySet().stream().filter(SubCommand::isDefault).filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst())
+                .map(subCommands::get).ifPresent((method) -> this.invokeMethod(method, event, member, channel, args));
+        /*if (matchesArgs.isPresent()) {
             this.invokeMethod(subCommands.get(matchesArgs.get()), event, member, channel, args);
         } else {
             subCommands.keySet().stream().filter(SubCommand::isDefault).filter((sub) -> event.checkBotPermissions(sub.botPerms()))
                     .findFirst().map(subCommands::get)
                     .ifPresent((method) -> this.invokeMethod(method, event, member, channel, args));
-        }
+        }*/
     }
 
     private void invokeMethod(Method method, CommandEvent event, Member member, TextChannel channel, String[] args) {

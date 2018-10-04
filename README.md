@@ -1,8 +1,8 @@
 # discord-api-command
 **A simple Command API for the JDA**
 
-CURRENT VERSION:  **3.2** <p>
-Other versions:  **3.1**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0** <p>
+CURRENT VERSION:  **3.2_01** <p>
+Other versions:  **3.2**, **3.1**, **3.0_3**, **3.0_2**, **3.0_1**, **3.0** <p>
 **[Changelog](https://github.com/JohnnyJayJay/discord-api-command/blob/master/changelog.md)**<br>
 **[Documentation](http://docs.johnnyjayjay.me)**
 
@@ -30,16 +30,24 @@ You can download the .jar-file in [this directory](https://github.com/JohnnyJayJ
  3. Eclipse: Right-click the jar: `Build Path -> Add To Build Path` <p> IntelliJ: Right-click the jar: `Add As Library`
  4. Done. You can now use it.
  
-### Adding Dependency in pom
-If you use Maven, you can add this library even less complicated: Just add the following dependency in your `pom.xml`:
+### Adding Dependency (Maven & Gradle)
+For Maven, add this to your `pom.xml`:
 ```xml
-<dependency>
-    <groupId>com.github.johnnyjayjay</groupId>
-    <artifactId>CommandAPI</artifactId>
-    <version>VERSION</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>com.github.johnnyjayjay</groupId>
+        <artifactId>CommandAPI</artifactId>
+        <version>VERSION</version>
+    </dependency>
+</dependencies>
 ```
-And that's it!
+
+For Gradle, add this to your `build.gradle`:
+```gradle
+dependencies {
+    compile "com.github.johnnyjayjay:CommandAPI:VERSION"
+}
+```
 
 ## Getting started
 ### Wrting Commands
@@ -112,17 +120,17 @@ public class ReportCommand extends AbstractCommand {
         // Error message
     }
     
-    @SubCommand(args = {this.MEMBER_MENTION}, moreArgs = true) // moreArgs: means that there has to be at least one more argument than specified. Useful for the report reason.
+    @SubCommand(args = {Regex.MEMBER_MENTION}, moreArgs = true) // moreArgs: means that there can be more arguments than specified. Useful for the report reason.
     public void onReport(CommandEvent event, Member member, TextChannel channel, String[] args) {
         // report the mentioned member
     }
     
-    @SubCommand(args = {"get", this.MEMBER_MENTION})
+    @SubCommand(args = {"get", Regex.MEMBER_MENTION})
     public void onReportsGet(CommandEvent event, Member member, TextChannel channel, String[] args) {
         // get the reports of the mentioned member
     }
     
-    @SubCommand(args = {"remove", this.MEMBER_MENTION})
+    @SubCommand(args = {"remove", Regex.MEMBER_MENTION})
     public void onReportsRemove(CommandEvent event, Member member, TextChannel channel, String[] args) {
         // remove the reports from the mentioned member
     }
@@ -193,6 +201,7 @@ There are a few more features to `CommandSettings`, such as:
 - Setting a message that is displayed in case of an unknown command
 - Setting a command cooldown (and specifying whether the cooldown should be reset on each execution attempt)
 - Setting a Color for `DefaultHelpCommand`
+- Adding listeners for Exceptions and unknown commands
 
 ### Exceptions
 This API should only throw one kind of exception, `CommandSetException` (except for explicitly thrown `IllegalArgumentException`s). 
@@ -201,18 +210,18 @@ If this is **NOT** the case and you get another exception thrown by anything ins
 `CommandSetException` is a sub class of `RuntimeException`, meaning that they don't have to be caught and they don't terminate the program.
 
 A `CommandSetException` is thrown if:
-- a label or a prefix does not match the requirements, i.e. the regex defined in `CommandSettings.VALID_PREFIX` and `CommandSettings.VALID_LABEL`. This includes:
+- a label or a prefix does not match the requirements, i.e. the regex defined in `Regex.VALID_PREFIX` and `Regex.VALID_LABEL`. This includes:
     - prefixes that contain one or more of the characters `\+*^|$?` or are just an empty String 
     - labels that contain any kind of blank spaces or are just an empty String
 - an instance of `CommandSettings` is activated or deactivated twice (which is not possible)
 - any other settings input for `CommandSettings` is invalid
 
-If you don't want to have any exceptions concerning prefixes and labels, it is recommended to check whether they match `CommandSettings.VALID_PREFIX` 
-or `CommandSettings.VALID_LABEL`.
+If you don't want to have any exceptions concerning prefixes and labels, it is recommended to check whether they match `Regex.VALID_PREFIX` 
+or `Regex.VALID_LABEL`. `com.github.johnnyjayjay.discord.commandapi.Regex` is a class that contains some regular expressions as `public static final String`s.
 
 ```java
 String prefix = // user input or something else you can't verify directly
-if (prefix.matches(CommandSettings.VALID_PREFIX)) {
+if (prefix.matches(Regex.VALID_PREFIX)) {
     // ...
 } else {
     // Tell the user

@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Methods annotated with this annotation must have the signature {@code void (com.github.johnnyjayjay.commandapi.CommandEvent, net.dv8tion.jda.core.entities.Member, net.dv8tion.jda.core.entities.TextChannel, java.lang.String[])}
  * in order to be registered (you will get a warning if a signature violates that).
  * @author JohnnyJayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 3.2
  * @see AbstractCommand
  */

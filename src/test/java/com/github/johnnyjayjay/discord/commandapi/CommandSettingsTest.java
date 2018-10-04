@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 /**
  * @author Johnny_JayJay
- * @version 0.1-SNAPSHOT
+ * @version 3.2_01
  */
 public class CommandSettingsTest {
 
@@ -111,7 +111,7 @@ public class CommandSettingsTest {
         int endIndex = random.nextInt(1, 36);
         int beginIndex = random.nextInt(endIndex);
         String ret = UUID.randomUUID().toString().substring(beginIndex, endIndex);
-        return replaceIllegalPrefixChars ? ret.replaceAll(CommandSettings.VALID_PREFIX.replace("^", ""), "") : ret;
+        return replaceIllegalPrefixChars ? ret.replaceAll(Regex.VALID_PREFIX.replace("^", ""), "") : ret;
     }
 
 }

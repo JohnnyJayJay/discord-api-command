@@ -1,15 +1,19 @@
 # Changelog
 
-### next patch
+### 3.2_01
 - Increased performance of CommandListener slightly
 - Added configurable Predicate to `CommandSettings` which tests an event before execution. This may be useful for own checks that are not provided by this framework
 - Added "listeners" for unknown commands (`CommandSettings#onUnknownCommand(Consumer<CommandEvent>)`) and Throwables (`CommandSettings#onException(BiConsumer<CommandEvent, Throwable>)`)
 - Added possibility to configure a custom thread pool (`CommandSettings#useMultiThreading(ExecutorService)`)
 - Added configurable messages that are sent in case someone is on cooldown or a command is unknown
+- Added possibility to deactivate Exception logging (`CommandSettings#setLogExceptions(boolean)`)
 - Added Regex util class (mainly for `AbstractCommand`)
 - Added `CommandEvent.Command#getPrefix()`
 - Changed Command parsing
+- Adjusted `AbstractCommand`'s code - made it more stream-like
+- Fixed bug in `DefaultHelpCommand` that prevented the general help message from working
 - Corrected mistake in documentation of `SubCommand#moreArgs()`
+- Updated readme
 
 ### 3.2
 - Updated to JDA version 3.7.1_387

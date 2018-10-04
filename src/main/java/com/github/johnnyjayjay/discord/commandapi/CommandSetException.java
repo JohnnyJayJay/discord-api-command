@@ -4,7 +4,7 @@ package com.github.johnnyjayjay.discord.commandapi;
  * Exception that is thrown in case of any problems concerning the CommandSettings. <br>
  * CommandSetExceptions are RuntimeExceptions.
  * @author Johnny_JayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 1.6
  * @see RuntimeException
  */

@@ -12,7 +12,7 @@ import java.util.Set;
  * This class implements ICommand, therefore each sub class can be added as a normal command with CommandSettings#put.
  * The framework provides a default implementation of this class, DefaultHelpCommand.
  * @author JohnnyJayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 3.2
  * @see DefaultHelpCommand
  */

@@ -6,7 +6,6 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,25 +28,29 @@ class CommandListener implements EventListener {
 
         GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) e;
         TextChannel channel = event.getChannel();
+        // if channel is not blacklisted and author is human (or bot execution is enabled)
         if (!settings.getBlacklistedChannels().contains(channel.getIdLong()) && (!event.getAuthor().isBot() || settings.botsMayExecute())) {
+            // if custom thread pool is configured: run async
             settings.execute(() -> {
                 String raw = event.getMessage().getContentRaw();
                 String prefix = settings.getPrefix(event.getGuild().getIdLong());
                 if (raw.startsWith(prefix)) {
-                    CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings);
-                    CommandEvent commandEvent = new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings);
-                    if (cmd.getExecutor() != null) {
+                    CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings); // parse command
+                    CommandEvent commandEvent = new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings); // create event
+                    if (cmd.getExecutor() != null) { // if command exists
+                        // care about cooldowns
                         long timestamp = System.currentTimeMillis();
                         long userId = event.getAuthor().getIdLong();
                         if (cooldowns.containsKey(userId) && (timestamp - cooldowns.get(userId)) < settings.getCooldown()) {
                             if (settings.isResetCooldown())
                                 cooldowns.put(userId, timestamp);
                             Message cooldownMessage = settings.getCooldownMessage();
-                            if (cooldownMessage != null && event.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
-                                channel.sendMessage(cooldownMessage).queue();
+                            if (cooldownMessage != null)
+                                commandEvent.respond(cooldownMessage);
                             return;
                         }
                         cooldowns.put(userId, timestamp);
+                        // execute command
                         try {
                             if (settings.mayCall(commandEvent)) {
                                 cmd.getExecutor().onCommand(commandEvent, event.getMember(), channel, cmd.getArgs());
@@ -56,12 +59,12 @@ class CommandListener implements EventListener {
                             settings.onException(commandEvent, t);
                             CommandSettings.LOGGER.warn("Command " + cmd.getExecutor().getClass().getName() + " had an uncaught exception:", t);
                         }
-                    } else {
+                    } else { // command is unknown
                         settings.onUnknownCommand(commandEvent);
                         // TODO: 03.10.2018 das entfernen
                         Message unknownCommand = settings.getUnknownCommandMessage();
-                        if (unknownCommand != null && event.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
-                            channel.sendMessage(unknownCommand).queue();
+                        if (unknownCommand != null)
+                            commandEvent.respond(unknownCommand);
                     }
                 }
             });

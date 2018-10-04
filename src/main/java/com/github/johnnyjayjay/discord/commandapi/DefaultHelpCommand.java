@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * If you want to use this, add a new instance of this class as a command in your CommandSettings with the put-method.
  * This class is final. To create your own help command implementation, please refer to AbstractHelpCommand.
  * @author JohnnyJayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 3.2
  * @see AbstractHelpCommand
  */
@@ -26,11 +26,10 @@ public final class DefaultHelpCommand extends AbstractHelpCommand {
     /**
      * Lists all commands along with the information that more help can be received by adding the optional label parameter.
      */
-    // FIXME: 03.10.2018 geht aktuell nicht
     @Override
     public void provideGeneralHelp(CommandEvent event, String prefix, Map<String, ICommand> commands) {
         Member selfMember = event.getGuild().getSelfMember();
-        if (event.checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
+        if (!event.checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
             return;
 
         CommandSettings settings = event.getCommandSettings();

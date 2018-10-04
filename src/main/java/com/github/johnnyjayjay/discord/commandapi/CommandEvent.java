@@ -21,7 +21,7 @@ import java.util.Optional;
  * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command
  * and provides several utilities to work with, such as the getFirstMention-methods
  * @author Johnny_JayJay
- * @version 3.2
+ * @version 3.2_01
  * @see GuildMessageReceivedEvent
  */
 public class CommandEvent extends GuildMessageReceivedEvent {
@@ -159,7 +159,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * Describes an executed Command. <p>
      * Is used to parse a message which seems to be a command.
      * @author Johnny_JayJay
-     * @version 3.2
+     * @version 3.2_01
      */
     public static class Command {
 
@@ -171,7 +171,6 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         private final String label;
         private final String[] args;
 
-        // TODO: 31.08.2018 performanteste und best accessible methode finden
         private Command(String raw, String prefix, CommandSettings settings) {
             String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
             this.label = settings.isLabelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];;

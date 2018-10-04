@@ -17,29 +17,32 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-// TODO: 31.08.2018 Exceptions besser regeln
+
 /**
  * To use this framework, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 1.1
  */
 public class CommandSettings {
 
     /**
      * A regex that only matches valid prefixes. Can be used to check user input.
+     * @deprecated Use {@link com.github.johnnyjayjay.discord.commandapi.Regex#VALID_PREFIX} instead
      */
+    @Deprecated
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
     /**
      * A regex that only matches valid labels. Can be used to check user input.
+     * @deprecated Use {@link com.github.johnnyjayjay.discord.commandapi.Regex#VALID_LABEL} instead
      */
+    @Deprecated
     public static final String VALID_LABEL = "[^\\s]+";
 
     // TODO: 05.08.2018 illegal prefix characters
@@ -52,15 +55,18 @@ public class CommandSettings {
     private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
     private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
 
-    private Message unknownCommandMessage;
-    private Message cooldownMessage;
-    private String defaultPrefix;
-    private long cooldown;
+    private final boolean labelIgnoreCase; // case doesnt matter
+    private boolean useShardManager; // effectively final
+
+    private Message unknownCommandMessage; // message sent if on cooldown
+    private Message cooldownMessage; // message sent if command unknown
+    private String defaultPrefix; // default prefix
+    private long cooldown; // cooldown
     private Color helpColor;
-    private Predicate<CommandEvent> check;
-    private Consumer<CommandEvent> unknownCommandHandler;
-    private BiConsumer<CommandEvent, Throwable> exceptionHandler;
-    private ExecutorService executorService;
+    private Predicate<CommandEvent> check; // check made before every command execution
+    private Consumer<CommandEvent> unknownCommandHandler; // called if command unknown
+    private BiConsumer<CommandEvent, Throwable> exceptionHandler; // called if uncaught exception
+    private ExecutorService executorService; // thread pool
 
     private final Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
     @Deprecated
@@ -74,11 +80,10 @@ public class CommandSettings {
     private final CommandListener listener;
 
     private boolean activated; // ...is this instance activated?
-    private boolean useShardManager;
 
-    private boolean labelIgnoreCase;
-    private boolean resetCooldown;
-    private boolean botExecution;
+    private boolean resetCooldown; // reset cooldown each execution
+    private boolean botExecution; // bots may execute commands
+    private boolean logExceptions; // uncaught exceptions are logged
 
 
     /**
@@ -124,7 +129,9 @@ public class CommandSettings {
         this.prefixMap = new HashMap<>();
         this.check = (e) -> true;
         this.unknownCommandHandler = (e) -> {};
+        this.exceptionHandler = (e, t) -> {};
         this.executorService = null;
+        this.logExceptions = true;
     }
 
     /**
@@ -332,7 +339,7 @@ public class CommandSettings {
      * @throws CommandSetException If the label is empty or consists of multiple words.
      */
     public CommandSettings put(@Nonnull ICommand executor, String label) {
-        if (label.matches(VALID_LABEL))
+        if (label.matches(Regex.VALID_LABEL))
             this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
             throw new CommandSetException(INVALID_LABEL_MESSAGE, new IllegalArgumentException("Label " + label + " is not valid"));
@@ -443,7 +450,7 @@ public class CommandSettings {
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
     public CommandSettings setDefaultPrefix(@Nonnull String prefix) {
-        if (prefix.matches(VALID_PREFIX))
+        if (prefix.matches(Regex.VALID_PREFIX))
             this.defaultPrefix = prefix;
         else
             throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
@@ -470,7 +477,7 @@ public class CommandSettings {
      * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
      */
     public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
-        if (prefix != null && !prefix.matches(VALID_PREFIX))
+        if (prefix != null && !prefix.matches(Regex.VALID_PREFIX))
             throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
         this.prefixMap.put(guildId, prefix);
         return this;
@@ -484,7 +491,7 @@ public class CommandSettings {
      * @throws CommandSetException if one of the prefixes is not valid.
      */
     public CommandSettings setCustomPrefixes(@Nonnull Map<Long, String> guildIdPrefixMap) {
-        if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(VALID_PREFIX)))
+        if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(Regex.VALID_PREFIX)))
             prefixMap.putAll(guildIdPrefixMap);
         else
             throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Invalid prefix"));
@@ -521,6 +528,18 @@ public class CommandSettings {
      */
     public CommandSettings setResetCooldown(boolean resetCooldown) {
         this.resetCooldown = resetCooldown;
+        return this;
+    }
+
+    /**
+     * Specifies whether uncaught Exceptions that occur in command execution should be logged. You might want to disable this
+     * if you handle Exceptions manually or in the onException-listener. By default, this is true.
+     * @param logExceptions true, if uncaught Exceptions should be logged. False, if not.
+     * @return The current object. This is to use fluent interface.
+     * @see this#onException(BiConsumer)
+     */
+    public CommandSettings setLogExceptions(boolean logExceptions) {
+        this.logExceptions = logExceptions;
         return this;
     }
 
@@ -729,6 +748,14 @@ public class CommandSettings {
      */
     public boolean botsMayExecute() {
         return this.botExecution;
+    }
+
+    /**
+     * Returns whether uncaught command exceptions are being logged.
+     * @return True, if this is enabled. False, if not.
+     */
+    public boolean isLogExceptions() {
+        return logExceptions;
     }
 
     /**
