@@ -23,6 +23,21 @@ import java.util.List;
 public class JDAMock implements JDA {
 
     @Override
+    public JDA awaitStatus(Status status) throws InterruptedException {
+        return null;
+    }
+
+    @Override
+    public IEventManager getEventManager() {
+        return null;
+    }
+
+    @Override
+    public RestAction<Webhook> getWebhookById(String s) {
+        return null;
+    }
+
+    @Override
     public Status getStatus() {
         return null;
     }

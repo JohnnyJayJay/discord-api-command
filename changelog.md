@@ -8,11 +8,12 @@
 - Added configurable messages that are sent in case someone is on cooldown or a command is unknown
 - Added possibility to deactivate Exception logging (`CommandSettings#setLogExceptions(boolean)`)
 - Added Regex util class (mainly for `AbstractCommand`)
-- Added `CommandEvent.Command#getPrefix()`
+- Added `CommandEvent.Command#getPrefix()` to get the prefix used in a command
 - Changed Command parsing
 - Adjusted `AbstractCommand`'s code - made it more stream-like
 - Fixed bug in `DefaultHelpCommand` that prevented the general help message from working
 - Corrected mistake in documentation of `SubCommand#moreArgs()`
+- Updated JDA version to 3.8.0_433
 - Updated readme
 
 ### 3.2

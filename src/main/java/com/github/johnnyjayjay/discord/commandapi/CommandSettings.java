@@ -131,6 +131,8 @@ public class CommandSettings {
         this.unknownCommandHandler = (e) -> {};
         this.exceptionHandler = (e, t) -> {};
         this.executorService = null;
+        this.unknownCommandMessage = null;
+        this.cooldownMessage = null;
         this.logExceptions = true;
     }
 
@@ -249,7 +251,7 @@ public class CommandSettings {
             this.executorService = null;
         } else {
             if (executorService.isShutdown())
-                throw new CommandSetException("Provided ExecutorService is invalid", new IllegalArgumentException("ExecutorService must not be shut down"));
+                throw new CommandSetException("Provided ExecutorService is invalid", new IllegalArgumentException("ExecutorService must not be shut down", new IllegalStateException("Illegal thread pool state")));
 
             this.executorService = executorService;
         }
@@ -282,7 +284,7 @@ public class CommandSettings {
      * @param channelIds A Collection of channel ids to be added.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings addChannelsToBlacklist(Collection<Long> channelIds) {
+    public CommandSettings addChannelsToBlacklist(@Nonnull Collection<Long> channelIds) {
         this.blacklistedChannels.addAll(channelIds);
         return this;
     }
@@ -316,7 +318,7 @@ public class CommandSettings {
      * @param channelIds the Collection to remove.
      * @return true, if this was successful, false, if not.
      */
-    public boolean removeChannelsFromBlackList(Collection<Long> channelIds) {
+    public boolean removeChannelsFromBlackList(@Nonnull Collection<Long> channelIds) {
         return this.blacklistedChannels.removeAll(channelIds);
     }
 
@@ -338,7 +340,7 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException If the label is empty or consists of multiple words.
      */
-    public CommandSettings put(@Nonnull ICommand executor, String label) {
+    public CommandSettings put(@Nonnull ICommand executor, @Nonnull String label) {
         if (label.matches(Regex.VALID_LABEL))
             this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
@@ -378,7 +380,7 @@ public class CommandSettings {
      * @param label The label of the command to remove.
      * @return true, if the label was successfully removed. false, if the given label doesn't exist.
      */
-    public boolean remove(String label) {
+    public boolean remove(@Nonnull String label) {
         return this.commands.remove(labelIgnoreCase ? label.toLowerCase() : label) != null;
     }
 
@@ -425,8 +427,13 @@ public class CommandSettings {
         this.botExecution = false;
         this.cooldown = 0;
         this.helpColor = null;
+        this.unknownCommandMessage = null;
+        this.cooldownMessage = null;
         this.resetCooldown = false;
+        this.logExceptions = true;
         this.check = (e) -> true;
+        this.exceptionHandler = (e, t) -> {};
+        this.unknownCommandHandler = (e) -> {};
         if (this.activated)
             this.deactivate();
         return this;
@@ -549,7 +556,7 @@ public class CommandSettings {
      * @param action a Consumer that takes the event.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings onUnknownCommand(Consumer<CommandEvent> action) {
+    public CommandSettings onUnknownCommand(@Nonnull Consumer<CommandEvent> action) {
         this.unknownCommandHandler = action;
         return this;
     }
@@ -559,7 +566,7 @@ public class CommandSettings {
      * @param action a BiConsumer that takes the event and the corresponding Throwable that had been thrown.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings onException(BiConsumer<CommandEvent, Throwable> action) {
+    public CommandSettings onException(@Nonnull BiConsumer<CommandEvent, Throwable> action) {
         this.exceptionHandler = action;
         return this;
     }
@@ -687,7 +694,7 @@ public class CommandSettings {
      * @param command The {@link com.github.johnnyjayjay.discord.commandapi.ICommand ICommand} instance to get the labels from
      * @return an unmodifiable Set of labels.
      */
-    public Set<String> getLabels(ICommand command) {
+    public Set<String> getLabels(@Nonnull ICommand command) {
         return Collections.unmodifiableSet(this.commands.keySet().stream().filter((label) -> this.commands.get(label).equals(command)).collect(Collectors.toSet()));
     }
     
