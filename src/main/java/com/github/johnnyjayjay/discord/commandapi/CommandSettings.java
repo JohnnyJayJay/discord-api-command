@@ -34,7 +34,7 @@ public class CommandSettings {
 
     /**
      * A regex that only matches valid prefixes. Can be used to check user input.
-     * @deprecated Use {@link com.github.johnnyjayjay.discord.commandapi.Regex#VALID_PREFIX} instead
+     * @deprecated Not needed anymore. Anything is a valid prefix now.
      */
     @Deprecated
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
@@ -51,9 +51,9 @@ public class CommandSettings {
      * The logger of this framework. This is protected.
      */
     protected static final Logger LOGGER = LoggerFactory.getLogger("CommandAPI");
-    
-    private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
-    private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
+
+    private final String INVALID_PREFIX_MESSAGE = "Prefix must not be empty!";
+    private final String INVALID_LABEL_MESSAGE = "Label must not be empty, consist of multiple words or contain new lines!";
 
     private final boolean labelIgnoreCase; // case doesnt matter
     private boolean useShardManager; // effectively final
@@ -84,6 +84,7 @@ public class CommandSettings {
     private boolean resetCooldown; // reset cooldown each execution
     private boolean botExecution; // bots may execute commands
     private boolean logExceptions; // uncaught exceptions are logged
+    private CommandSetException prefixIsNotValid;
 
 
     /**
@@ -115,6 +116,7 @@ public class CommandSettings {
     }
 
     private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase) {
+        this.prefixIsNotValid = new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         this.commands = new HashMap<>();
         this.listener = new CommandListener(this);
         this.activated = false;
@@ -240,11 +242,11 @@ public class CommandSettings {
     }
 
     /**
-     * Creates the ExecutorService for this framework with the provided pool size. This may, of course, increase performance.
-     * By default, this framework uses only one thread to execute commands.
+     * Sets an ExecutorService that is used to execute commands asynchronously. This may, of course, increase performance.
+     * By default, this framework uses the JDA event threads.
      * @param executorService The ExecutorService that should provide threads
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException If the provided size is <= 0.
+     * @throws CommandSetException If the provided ExecutorService is shut down
      */
     public CommandSettings useMultiThreading(@Nullable ExecutorService executorService) {
         if (executorService == null) {
@@ -454,13 +456,14 @@ public class CommandSettings {
      * Use this method to set the default prefix.
      * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
+     * @throws CommandSetException if a non-null prefix is empty.
      */
     public CommandSettings setDefaultPrefix(@Nonnull String prefix) {
-        if (prefix.matches(Regex.VALID_PREFIX))
+        if (!prefix.isEmpty())
             this.defaultPrefix = prefix;
-        else
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
+        else {
+            throw prefixIsNotValid;
+        }
         return this;
     }
 
@@ -476,16 +479,16 @@ public class CommandSettings {
     }
 
     /**
-     * Use this method to add a custom command prefix to a guild. This will only work if you instantiated this class with useCustomPrefixes set to true.
+     * Use this method to add a custom command prefix to a guild.
      * You can remove the custom prefix from a guild by setting its prefix to null.
      * @param guildId The guild id as a long.
      * @param prefix The nullable prefix to be set.
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
+     * @throws CommandSetException if a non-null prefix is empty.
      */
     public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
-        if (prefix != null && !prefix.matches(Regex.VALID_PREFIX))
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
+        if (prefix != null && prefix.isEmpty())
+            throw prefixIsNotValid;
         this.prefixMap.put(guildId, prefix);
         return this;
     }
@@ -495,13 +498,13 @@ public class CommandSettings {
      * prefixes for, because this bulk adds the Map parameter.
      * @param guildIdPrefixMap A Map which contains the prefix for each guild to add. Key: guild ID (Long), Value: prefix (String)
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if one of the prefixes is not valid.
+     * @throws CommandSetException if one of the prefixes is empty.
      */
     public CommandSettings setCustomPrefixes(@Nonnull Map<Long, String> guildIdPrefixMap) {
-        if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(Regex.VALID_PREFIX)))
+        if (guildIdPrefixMap.values().stream().noneMatch(String::isEmpty))
             prefixMap.putAll(guildIdPrefixMap);
         else
-            throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Invalid prefix"));
+            throw prefixIsNotValid;
         return this;
     }
 

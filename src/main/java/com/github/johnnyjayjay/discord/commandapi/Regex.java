@@ -30,10 +30,6 @@ public class Regex {
     public static final String ANYTHING = ".*";
 
     /**
-     * A regex that only matches valid prefixes. Can be used to check user input.
-     */
-    public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
-    /**
      * A regex that only matches valid labels. Can be used to check user input.
      */
     public static final String VALID_LABEL = "[^\\s]+";

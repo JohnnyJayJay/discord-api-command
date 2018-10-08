@@ -9,6 +9,7 @@
 - Added possibility to deactivate Exception logging (`CommandSettings#setLogExceptions(boolean)`)
 - Added Regex util class (mainly for `AbstractCommand`)
 - Added `CommandEvent.Command#getPrefix()` to get the prefix used in a command
+- Finally fixed invalid prefixes; any String that is not empty can be a prefix now
 - Changed Command parsing
 - Adjusted `AbstractCommand`'s code - made it more stream-like
 - Fixed bug in `DefaultHelpCommand` that prevented the general help message from working

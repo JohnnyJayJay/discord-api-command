@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 // TODO: 31.08.2018 GenericCommandEvent, CommandFailureEvent (mit reason), CommandOnCooldownEvent, CommandUnknownEvent 
 /**
@@ -172,7 +173,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         private final String[] args;
 
         private Command(String raw, String prefix, CommandSettings settings) {
-            String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
+            String[] argsWithoutPrefix = raw.replaceFirst(Pattern.quote(prefix), "").split("\\s+");
             this.label = settings.isLabelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];;
             this.command = settings.getCommands().getOrDefault(this.label, null);
             this.rawMessage = raw;
