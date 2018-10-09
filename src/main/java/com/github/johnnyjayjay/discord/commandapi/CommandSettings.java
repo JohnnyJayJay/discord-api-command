@@ -40,7 +40,7 @@ public class CommandSettings {
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
     /**
      * A regex that only matches valid labels. Can be used to check user input.
-     * @deprecated Use {@link com.github.johnnyjayjay.discord.commandapi.Regex#VALID_LABEL} instead
+     * @deprecated Use {@link Util#VALID_LABEL} instead
      */
     @Deprecated
     public static final String VALID_LABEL = "[^\\s]+";
@@ -84,7 +84,6 @@ public class CommandSettings {
     private boolean resetCooldown; // reset cooldown each execution
     private boolean botExecution; // bots may execute commands
     private boolean logExceptions; // uncaught exceptions are logged
-    private CommandSetException prefixIsNotValid;
 
 
     /**
@@ -116,7 +115,6 @@ public class CommandSettings {
     }
 
     private CommandSettings(@Nonnull String defaultPrefix, boolean labelIgnoreCase) {
-        this.prefixIsNotValid = new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         this.commands = new HashMap<>();
         this.listener = new CommandListener(this);
         this.activated = false;
@@ -343,7 +341,7 @@ public class CommandSettings {
      * @throws CommandSetException If the label is empty or consists of multiple words.
      */
     public CommandSettings put(@Nonnull ICommand executor, @Nonnull String label) {
-        if (label.matches(Regex.VALID_LABEL))
+        if (label.matches(Util.VALID_LABEL))
             this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
             throw new CommandSetException(INVALID_LABEL_MESSAGE, new IllegalArgumentException("Label " + label + " is not valid"));
@@ -462,7 +460,7 @@ public class CommandSettings {
         if (!prefix.isEmpty())
             this.defaultPrefix = prefix;
         else {
-            throw prefixIsNotValid;
+            throw new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         }
         return this;
     }
@@ -488,7 +486,7 @@ public class CommandSettings {
      */
     public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
         if (prefix != null && prefix.isEmpty())
-            throw prefixIsNotValid;
+            throw new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         this.prefixMap.put(guildId, prefix);
         return this;
     }
@@ -504,7 +502,7 @@ public class CommandSettings {
         if (guildIdPrefixMap.values().stream().noneMatch(String::isEmpty))
             prefixMap.putAll(guildIdPrefixMap);
         else
-            throw prefixIsNotValid;
+            throw new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         return this;
     }
 
@@ -775,17 +773,26 @@ public class CommandSettings {
     @Override
     public String toString() {
         return "CommandSettings{" +
-                "unknownCommandMessage=" + unknownCommandMessage +
+                "labelIgnoreCase=" + labelIgnoreCase +
+                ", useShardManager=" + useShardManager +
+                ", unknownCommandMessage=" + unknownCommandMessage +
+                ", cooldownMessage=" + cooldownMessage +
                 ", defaultPrefix='" + defaultPrefix + '\'' +
                 ", cooldown=" + cooldown +
                 ", helpColor=" + helpColor +
+                ", check=" + check +
+                ", unknownCommandHandler=" + unknownCommandHandler +
+                ", exceptionHandler=" + exceptionHandler +
+                ", executorService=" + executorService +
                 ", blacklistedChannels=" + blacklistedChannels +
                 ", prefixMap=" + prefixMap +
                 ", commands=" + commands +
+                ", jda=" + jda +
+                ", listener=" + listener +
                 ", activated=" + activated +
-                ", labelIgnoreCase=" + labelIgnoreCase +
                 ", resetCooldown=" + resetCooldown +
                 ", botExecution=" + botExecution +
+                ", logExceptions=" + logExceptions +
                 '}';
     }
 

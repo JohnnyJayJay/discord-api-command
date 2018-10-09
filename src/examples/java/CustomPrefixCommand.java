@@ -11,8 +11,7 @@ public class CustomPrefixCommand extends AbstractCommand {
 
     @SubCommand(isDefault = true, botPerms = {Permission.MESSAGE_WRITE})
     public void everythingElse(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        event.respond("Correct usage: `" + event.getCommandSettings().getPrefix(event.getGuild().getIdLong()) + "prefix [get|set] <custom|default> <prefix>`\n" +
-                "If you set a new prefix, it has to be valid, i.e. match this regex: " + Regex.VALID_PREFIX);
+        event.respond("Correct usage: `" + event.getCommandSettings().getPrefix(event.getGuild().getIdLong()) + "prefix [get|set] <custom|default> <prefix>`");
     }
 
     @SubCommand(args = {"get"}, botPerms = {Permission.MESSAGE_WRITE})
@@ -21,16 +20,13 @@ public class CustomPrefixCommand extends AbstractCommand {
         event.respond("The prefix for this guild is: `" + settings.getPrefix(event.getGuild().getIdLong()) + "`\nThe default prefix is: `" + settings.getPrefix() + "`");
     }
 
-    @SubCommand(args = {"set", "custom", Regex.VALID_PREFIX}, botPerms = {Permission.MESSAGE_WRITE})
+    @SubCommand(args = {"set", "custom", ".*"}, moreArgs = true, botPerms = {Permission.MESSAGE_WRITE})
     public void setCustomPrefix(CommandEvent event, Member member, TextChannel channel, String[] args) {
-        if (args[2].matches(Regex.VALID_PREFIX)) {
-            event.getCommandSettings().setCustomPrefix(event.getGuild().getIdLong(), args[2]);
-            event.respond("Successfully set prefix for this guild to `" + args[2] + "`!");
-        } else
-            event.respond("You need to specify a valid prefix as the third argument!");
+        event.getCommandSettings().setCustomPrefix(event.getGuild().getIdLong(), args[2]);
+        event.respond("Successfully set prefix for this guild to `" + args[2] + "`!");
     }
 
-    @SubCommand(args = {"set", "default", Regex.VALID_PREFIX}, botPerms = {Permission.MESSAGE_WRITE})
+    @SubCommand(args = {"set", "default", ".*"}, moreArgs = true, botPerms = {Permission.MESSAGE_WRITE})
     public void setDefaultPrefix(CommandEvent event, Member member, TextChannel channel, String[] args) {
         event.getCommandSettings().setDefaultPrefix(args[2]);
         event.respond("Successfully set default prefix to `" + args[2] + "`!");
