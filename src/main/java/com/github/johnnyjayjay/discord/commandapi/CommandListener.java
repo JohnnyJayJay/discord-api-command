@@ -57,7 +57,9 @@ class CommandListener implements EventListener {
                             }
                         } catch (Throwable t) {
                             settings.onException(commandEvent, t);
-                            CommandSettings.LOGGER.warn("Command " + cmd.getExecutor().getClass().getName() + " had an uncaught exception:", t);
+                            if (settings.isLogExceptions()) {
+                                CommandSettings.LOGGER.warn("Command " + cmd.getExecutor().getClass().getName() + " had an uncaught exception:", t);
+                            }
                         }
                     } else { // command is unknown
                         settings.onUnknownCommand(commandEvent);

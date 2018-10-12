@@ -140,6 +140,7 @@
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>3.8.0_433</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

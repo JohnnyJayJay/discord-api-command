@@ -85,7 +85,12 @@ public abstract class AbstractCommand implements ICommand {
         } catch (IllegalAccessException e) {
             CommandSettings.LOGGER.error("An unexpected Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
         } catch (InvocationTargetException e) {
-            CommandSettings.LOGGER.warn("Command " + event.getCommand().getExecutor().getClass().getName() + " had an uncaught Exception in SubCommand " + method.getName() + ":", e.getCause());
+            CommandSettings settings = event.getCommandSettings();
+            Throwable cause = e.getCause();
+            if (settings.isLogExceptions()) {
+                CommandSettings.LOGGER.warn("Command " + event.getCommand().getExecutor().getClass().getName() + " had an uncaught Exception in SubCommand " + method.getName() + ":", cause);
+            }
+            settings.onException(event, cause);
         }
     }
 
