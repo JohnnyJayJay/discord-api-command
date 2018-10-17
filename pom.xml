@@ -7,7 +7,7 @@
     <groupId>com.github.johnnyjayjay</groupId>
     <artifactId>CommandAPI</artifactId>
     <packaging>jar</packaging>
-    <version>3.2_01-1-SNAPSHOT</version>
+    <version>3.2_01-3-SNAPSHOT</version>
 
     <build>
         <plugins>
@@ -56,7 +56,7 @@
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
-                        <phase>package</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>

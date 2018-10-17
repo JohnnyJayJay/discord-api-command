@@ -180,7 +180,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
             this.prefix = prefix;
             this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
             this.joinedArgs = String.join(" ", this.args);
-            this.rawArgs = raw.replaceFirst(prefix + this.label + "\\s+", "");
+            this.rawArgs = raw.replaceFirst(Pattern.quote(prefix + this.label) + "\\s+", "");
         }
 
         /**
