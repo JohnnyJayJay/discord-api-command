@@ -13,12 +13,14 @@ import java.util.Map;
 
 class CommandListener implements EventListener {
 
+    private String globalPrefix; // The Global Prefix
     private CommandSettings settings;
     private Map<Long, Long> cooldowns; // Long: User id, Long: last timestamp
 
-    public CommandListener(CommandSettings settings) {
+    public CommandListener(CommandSettings settings, String globalPrefix) {
         this.settings = settings;
         this.cooldowns = new HashMap<>();
+        this.globalPrefix = globalPrefix;
     }
 
     @Override
@@ -34,7 +36,7 @@ class CommandListener implements EventListener {
             settings.execute(() -> {
                 String raw = event.getMessage().getContentRaw();
                 String prefix = settings.getPrefix(event.getGuild().getIdLong());
-                if (raw.startsWith(prefix)) {
+                if (raw.startsWith(prefix) || raw.startsWith(globalPrefix)) {
                     CommandEvent.Command cmd = CommandEvent.parseCommand(raw, prefix, settings); // parse command
                     CommandEvent commandEvent = new CommandEvent(event.getJDA(), event.getResponseNumber(), event.getMessage(), cmd, settings); // create event
                     if (cmd.getExecutor() != null) { // if command exists
