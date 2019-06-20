@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.core.hooks.SubscribeEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,8 @@ class CommandListener extends ListenerAdapter {
         this.settings = settings;
         this.cooldowns = new HashMap<>();
     }
-
+    
+    @SubscribeEvent
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         TextChannel channel = event.getChannel();
