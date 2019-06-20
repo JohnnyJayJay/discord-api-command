@@ -1,4 +1,6 @@
 # discord-api-command
+**THIS LIBRARY IS NOT BEING UPDATED ANYMORE!**
+
 **A simple Command API for the JDA**
 
 CURRENT VERSION:  **3.2** <p>
