@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 /**
  * @author Johnny_JayJay
- * @version 0.1-SNAPSHOT
+ * @version 3.2_01
  */
 public class CommandSettingsTest {
 
@@ -38,14 +38,14 @@ public class CommandSettingsTest {
     @Test
     public void setCustomPrefixTest() {
         for (int i = 0; i < 10000; i++) {
-            String prefix = randomString(true);
+            String prefix = randomString();
             long id = random.nextLong();
             settings.setCustomPrefix(id, prefix);
             assertEquals("One prefix was not set correctly (manual adding)", prefix, settings.getPrefix(id));
         }
         Map<Long, String> prefixes = new HashMap<>();
         for (int i = 0; i < 10000; i++)
-            prefixes.put(random.nextLong(), randomString(true));
+            prefixes.put(random.nextLong(), randomString());
         settings.setCustomPrefixes(prefixes);
         prefixes.forEach((id, prefix) -> assertEquals("One prefix was not set correctly (bulk adding)", prefix, settings.getPrefix(id)));
     }
@@ -72,7 +72,7 @@ public class CommandSettingsTest {
         ICommand command = (event, member, channel, args) -> {};
         Set<String> randomLabels = new HashSet<>();
         for (int i = 0; i < 10000; i++)
-            randomLabels.add(randomString(false).toLowerCase());
+            randomLabels.add(randomString().toLowerCase());
         settings.put(command, randomLabels);
         Set<String> actualLabels = settings.getLabels(command);
         assertEquals("Labels for command were not set correctly", actualLabels, randomLabels);
@@ -107,11 +107,10 @@ public class CommandSettingsTest {
     }
 
 
-    private String randomString(boolean replaceIllegalPrefixChars) {
+    private String randomString() {
         int endIndex = random.nextInt(1, 36);
         int beginIndex = random.nextInt(endIndex);
-        String ret = UUID.randomUUID().toString().substring(beginIndex, endIndex);
-        return replaceIllegalPrefixChars ? ret.replaceAll(CommandSettings.VALID_PREFIX.replace("^", ""), "") : ret;
+        return UUID.randomUUID().toString().substring(beginIndex, endIndex);
     }
 
 }

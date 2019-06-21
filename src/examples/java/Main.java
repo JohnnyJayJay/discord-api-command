@@ -14,9 +14,10 @@ public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException {
         JDA jda = new JDABuilder(AccountType.BOT).setToken(Secrets.TOKEN).buildBlocking();
-        // default prefix shall be "!" and we want the labels to be case insensitive.
+        // default prefix shall be "!!" and we want the labels to be case insensitive.
         new CommandSettings("!!", jda, true).setCooldown(3000) // commands can only be executed every 3 seconds now
                 .put(new PingCommand(), "ping", "p")
+                .put(new DefaultHelpCommand(), "help") // registering help command
                 .put(new CustomPrefixCommand(), "prefix")
                 .activate(); // Activating! Very important!
     }

@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Methods annotated with this annotation must have the signature {@code void (com.github.johnnyjayjay.commandapi.CommandEvent, net.dv8tion.jda.core.entities.Member, net.dv8tion.jda.core.entities.TextChannel, java.lang.String[])}
  * in order to be registered (you will get a warning if a signature violates that).
  * @author JohnnyJayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 3.2
  * @see AbstractCommand
  */
@@ -39,8 +39,8 @@ public @interface SubCommand {
     String[] args() default {};
 
     /**
-     * A boolean that indicates that there must be more arguments than specified in args in order to be triggered.
-     * This might be useful for commands with an open argument length. If this is set to true, the command argument length must be greater than SubCommand#args().length.
+     * A boolean that indicates that there may be more arguments than specified in args in order to be triggered.
+     * This might be useful for commands with an open argument length. If this is set to true, the command argument length must be equal to or greater than SubCommand#args().length.
      * This is ignored if specified in an isDefault-SubCommand.
      * @return false by default.
      */

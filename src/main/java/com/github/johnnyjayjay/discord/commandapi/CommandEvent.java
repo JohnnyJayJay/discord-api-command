@@ -15,12 +15,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
+// TODO: 31.08.2018 GenericCommandEvent, CommandFailureEvent (mit reason), CommandOnCooldownEvent, CommandUnknownEvent 
 /**
  * Represents a command event. This is not much different from a GuildMessageReceivedEvent, though it gives access to the called command
  * and provides several utilities to work with, such as the getFirstMention-methods
  * @author Johnny_JayJay
- * @version 3.2
+ * @version 3.2_01
  * @see GuildMessageReceivedEvent
  */
 public class CommandEvent extends GuildMessageReceivedEvent {
@@ -39,7 +41,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @param msg The message to respond with as a String.
      */
     public void respond(String msg) {
-        if (checkBotPermissions(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))
+        if (checkBotPermissions(Permission.MESSAGE_WRITE))
             this.getChannel().sendMessage(msg).queue();
     }
 
@@ -107,6 +109,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @return An Optional of the first mentioned Member in the event message.
      * @see Optional
      */
+    @SuppressWarnings("unchecked")
     public Optional<User> getFirstUserMention() {
         return (Optional<User>) getFirstMention(Message.MentionType.USER);
     }
@@ -116,6 +119,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @return An Optional of the first mentioned Role in the event message.
      * @see Optional
      */
+    @SuppressWarnings("unchecked")
     public Optional<Role> getFirstRoleMention() {
         return (Optional<Role>) getFirstMention(Message.MentionType.ROLE);
     }
@@ -125,6 +129,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * @return An Optional of the first mentioned TextChannel in the event message.
      * @see Optional
      */
+    @SuppressWarnings("unchecked")
     public Optional<TextChannel> getFirstChannelMention() {
         return (Optional<TextChannel>) getFirstMention(Message.MentionType.CHANNEL);
     }
@@ -155,7 +160,7 @@ public class CommandEvent extends GuildMessageReceivedEvent {
      * Describes an executed Command. <p>
      * Is used to parse a message which seems to be a command.
      * @author Johnny_JayJay
-     * @version 3.1_1
+     * @version 3.2_01
      */
     public static class Command {
 
@@ -163,25 +168,27 @@ public class CommandEvent extends GuildMessageReceivedEvent {
         private final String joinedArgs;
         private final String rawArgs;
         private final String rawMessage;
+        private final String prefix;
         private final String label;
         private final String[] args;
 
         private Command(String raw, String prefix, CommandSettings settings) {
-            String[] argsWithoutPrefix = raw.replaceFirst(prefix, "").split("\\s+");
+            String[] argsWithoutPrefix = raw.replaceFirst(Pattern.quote(prefix), "").split("\\s+");
             this.label = settings.isLabelIgnoreCase() ? argsWithoutPrefix[0].toLowerCase() : argsWithoutPrefix[0];;
-            if (!settings.getCommands().containsKey(this.label)) {
-                this.command = null;
-                this.joinedArgs = null;
-                this.rawMessage = null;
-                this.rawArgs = null;
-                this.args = null;
-            } else {
-                this.command = settings.getCommands().get(this.label);
-                this.rawMessage = raw;
-                this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
-                this.joinedArgs = String.join(" ", this.args);
-                this.rawArgs = raw.replaceFirst(prefix + this.label + "\\s+", "");
-            }
+            this.command = settings.getCommands().getOrDefault(this.label, null);
+            this.rawMessage = raw;
+            this.prefix = prefix;
+            this.args = Arrays.copyOfRange(argsWithoutPrefix, 1, argsWithoutPrefix.length);
+            this.joinedArgs = String.join(" ", this.args);
+            this.rawArgs = raw.replaceFirst(Pattern.quote(prefix + this.label) + "\\s+", "");
+        }
+
+        /**
+         * Returns the prefix used to call this command.
+         * @return The prefix.
+         */
+        public String getPrefix() {
+            return prefix;
         }
 
         /**

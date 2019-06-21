@@ -7,7 +7,7 @@
     <groupId>com.github.johnnyjayjay</groupId>
     <artifactId>CommandAPI</artifactId>
     <packaging>jar</packaging>
-    <version>3.2</version>
+    <version>3.2_01-3-SNAPSHOT</version>
 
     <build>
         <plugins>
@@ -56,6 +56,7 @@
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -132,13 +133,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>RELEASE</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.7.1_387</version>
+            <version>3.8.0_433</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

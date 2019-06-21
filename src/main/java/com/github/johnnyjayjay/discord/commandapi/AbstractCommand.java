@@ -24,19 +24,6 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCommand implements ICommand {
 
-    /**
-     * A regex to match member mentions.
-     */
-    protected final String MEMBER_MENTION = "<@!?\\d+>";
-    /**
-     * A regex to match role mentions.
-     */
-    protected final String ROLE_MENTION = "<&\\d+>";
-    /**
-     * A regex to match text channel mentions.
-     */
-    protected final String CHANNEL_MENTION = "<#\\d+>";
-
     private final Map<SubCommand, Method> subCommands;
 
     /**
@@ -68,7 +55,7 @@ public abstract class AbstractCommand implements ICommand {
     @Override
     public final void onCommand(CommandEvent event, Member member, TextChannel channel, String[] args) {
         CommandSettings settings = event.getCommandSettings();
-        Optional<SubCommand> matchesArgs = subCommands.keySet().stream()
+        subCommands.keySet().stream()
                 .filter((sub) -> !sub.isDefault())
                 .filter((sub) -> sub.args().length == args.length || (sub.moreArgs() && args.length > sub.args().length))
                 .filter((sub) -> {
@@ -80,23 +67,30 @@ public abstract class AbstractCommand implements ICommand {
                     }
                     return true;
                 })
-                .filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst();
-        if (matchesArgs.isPresent()) {
+                .filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst().map(Optional::of)
+                .orElseGet(() -> subCommands.keySet().stream().filter(SubCommand::isDefault).filter((sub) -> event.checkBotPermissions(sub.botPerms())).findFirst())
+                .map(subCommands::get).ifPresent((method) -> this.invokeMethod(method, event, member, channel, args));
+        /*if (matchesArgs.isPresent()) {
             this.invokeMethod(subCommands.get(matchesArgs.get()), event, member, channel, args);
         } else {
-            subCommands.keySet().stream().filter((sub) -> event.checkBotPermissions(sub.botPerms()))
-                    .filter(SubCommand::isDefault).findFirst().map(subCommands::get)
+            subCommands.keySet().stream().filter(SubCommand::isDefault).filter((sub) -> event.checkBotPermissions(sub.botPerms()))
+                    .findFirst().map(subCommands::get)
                     .ifPresent((method) -> this.invokeMethod(method, event, member, channel, args));
-        }
+        }*/
     }
 
     private void invokeMethod(Method method, CommandEvent event, Member member, TextChannel channel, String[] args) {
         try {
             method.invoke(this, event, member, channel, args);
         } catch (IllegalAccessException e) {
-            CommandSettings.LOGGER.error("An Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
+            CommandSettings.LOGGER.error("An unexpected Exception occurred while trying to invoke sub command method; Please report this in a github issue. https://github.com/JohnnyJayJay/discord-api-command/issues", e);
         } catch (InvocationTargetException e) {
-            CommandSettings.LOGGER.warn("One of the commands had an uncaught exception:", e.getCause());
+            CommandSettings settings = event.getCommandSettings();
+            Throwable cause = e.getCause();
+            if (settings.isLogExceptions()) {
+                CommandSettings.LOGGER.warn("Command " + event.getCommand().getExecutor().getClass().getName() + " had an uncaught Exception in SubCommand " + method.getName() + ":", cause);
+            }
+            settings.onException(event, cause);
         }
     }
 

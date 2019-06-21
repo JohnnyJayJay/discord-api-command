@@ -16,24 +16,33 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 
 /**
  * To use this framework, create a new object of this class and add your command classes by using add(...)<p>
  * When you want your commands to become active, use activate()
  * @author Johnny_JayJay
- * @version 3.2
+ * @version 3.2_01
  * @since 1.1
  */
 public class CommandSettings {
 
     /**
      * A regex that only matches valid prefixes. Can be used to check user input.
+     * @deprecated Not needed anymore. Anything is a valid prefix now.
      */
+    @Deprecated
     public static final String VALID_PREFIX = "[^\\\\+*^|$?]+";
     /**
      * A regex that only matches valid labels. Can be used to check user input.
+     * @deprecated Use {@link Util#VALID_LABEL} instead
      */
+    @Deprecated
     public static final String VALID_LABEL = "[^\\s]+";
 
     // TODO: 05.08.2018 illegal prefix characters
@@ -42,14 +51,22 @@ public class CommandSettings {
      * The logger of this framework. This is protected.
      */
     protected static final Logger LOGGER = LoggerFactory.getLogger("CommandAPI");
-    
-    private final String INVALID_PREFIX_MESSAGE = "Prefix cannot be empty or contain the characters +*^|$\\?";
-    private final String INVALID_LABEL_MESSAGE = "Label cannot be empty, consist of multiple words or contain new lines!";
 
-    private Message unknownCommandMessage;
-    private String defaultPrefix;
-    private long cooldown;
+    private final String INVALID_PREFIX_MESSAGE = "Prefix must not be empty!";
+    private final String INVALID_LABEL_MESSAGE = "Label must not be empty, consist of multiple words or contain new lines!";
+
+    private final boolean labelIgnoreCase; // case doesnt matter
+    private boolean useShardManager; // effectively final
+
+    private Message unknownCommandMessage; // message sent if on cooldown
+    private Message cooldownMessage; // message sent if command unknown
+    private String defaultPrefix; // default prefix
+    private long cooldown; // cooldown
     private Color helpColor;
+    private Predicate<CommandEvent> check; // check made before every command execution
+    private Consumer<CommandEvent> unknownCommandHandler; // called if command unknown
+    private BiConsumer<CommandEvent, Throwable> exceptionHandler; // called if uncaught exception
+    private ExecutorService executorService; // thread pool
 
     private final Set<Long> blacklistedChannels; // ids of those channels where no command will trigger this api to execute anything.
     @Deprecated
@@ -63,11 +80,10 @@ public class CommandSettings {
     private final CommandListener listener;
 
     private boolean activated; // ...is this instance activated?
-    private boolean useShardManager;
 
-    private boolean labelIgnoreCase;
-    private boolean resetCooldown;
-    private boolean botExecution;
+    private boolean resetCooldown; // reset cooldown each execution
+    private boolean botExecution; // bots may execute commands
+    private boolean logExceptions; // uncaught exceptions are logged
 
 
     /**
@@ -111,6 +127,13 @@ public class CommandSettings {
         this.helpLabels = new HashSet<>();
         this.blacklistedChannels = new HashSet<>();
         this.prefixMap = new HashMap<>();
+        this.check = (e) -> true;
+        this.unknownCommandHandler = (e) -> {};
+        this.exceptionHandler = (e, t) -> {};
+        this.executorService = null;
+        this.unknownCommandMessage = null;
+        this.cooldownMessage = null;
+        this.logExceptions = true;
     }
 
     /**
@@ -217,6 +240,25 @@ public class CommandSettings {
     }
 
     /**
+     * Sets an ExecutorService that is used to execute commands asynchronously. This may, of course, increase performance.
+     * By default, this framework uses the JDA event threads.
+     * @param executorService The ExecutorService that should provide threads
+     * @return The current object. This is to use fluent interface.
+     * @throws CommandSetException If the provided ExecutorService is shut down
+     */
+    public CommandSettings useMultiThreading(@Nullable ExecutorService executorService) {
+        if (executorService == null) {
+            this.executorService = null;
+        } else {
+            if (executorService.isShutdown())
+                throw new CommandSetException("Provided ExecutorService is invalid", new IllegalArgumentException("ExecutorService must not be shut down", new IllegalStateException("Illegal thread pool state")));
+
+            this.executorService = executorService;
+        }
+        return this;
+    }
+
+    /**
      * Adds a given channel to the blacklist (meaning commands can not be executed in there).
      * @param channelId the id of the channel to be blacklisted.
      * @return The current object. This is to use fluent interface.
@@ -242,7 +284,7 @@ public class CommandSettings {
      * @param channelIds A Collection of channel ids to be added.
      * @return The current object. This is to use fluent interface.
      */
-    public CommandSettings addChannelsToBlacklist(Collection<Long> channelIds) {
+    public CommandSettings addChannelsToBlacklist(@Nonnull Collection<Long> channelIds) {
         this.blacklistedChannels.addAll(channelIds);
         return this;
     }
@@ -276,7 +318,7 @@ public class CommandSettings {
      * @param channelIds the Collection to remove.
      * @return true, if this was successful, false, if not.
      */
-    public boolean removeChannelsFromBlackList(Collection<Long> channelIds) {
+    public boolean removeChannelsFromBlackList(@Nonnull Collection<Long> channelIds) {
         return this.blacklistedChannels.removeAll(channelIds);
     }
 
@@ -298,8 +340,8 @@ public class CommandSettings {
      * @return The current object. This is to use fluent interface.
      * @throws CommandSetException If the label is empty or consists of multiple words.
      */
-    public CommandSettings put(@Nonnull ICommand executor, String label) {
-        if (label.matches(VALID_LABEL))
+    public CommandSettings put(@Nonnull ICommand executor, @Nonnull String label) {
+        if (label.matches(Util.VALID_LABEL))
             this.commands.put(labelIgnoreCase ? label.toLowerCase() : label, executor);
         else
             throw new CommandSetException(INVALID_LABEL_MESSAGE, new IllegalArgumentException("Label " + label + " is not valid"));
@@ -338,7 +380,7 @@ public class CommandSettings {
      * @param label The label of the command to remove.
      * @return true, if the label was successfully removed. false, if the given label doesn't exist.
      */
-    public boolean remove(String label) {
+    public boolean remove(@Nonnull String label) {
         return this.commands.remove(labelIgnoreCase ? label.toLowerCase() : label) != null;
     }
 
@@ -385,9 +427,26 @@ public class CommandSettings {
         this.botExecution = false;
         this.cooldown = 0;
         this.helpColor = null;
+        this.unknownCommandMessage = null;
+        this.cooldownMessage = null;
         this.resetCooldown = false;
+        this.logExceptions = true;
+        this.check = (e) -> true;
+        this.exceptionHandler = (e, t) -> {};
+        this.unknownCommandHandler = (e) -> {};
         if (this.activated)
             this.deactivate();
+        return this;
+    }
+
+    /**
+     * Sets a Predicate that tests every CommandEvent before executing it. This may be useful für own cooldown implementations and such.
+     * By default, this Predicate always returns true.
+     * @param check The Predicate to use as a check.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings setCheck(@Nonnull Predicate<CommandEvent> check) {
+        this.check = check;
         return this;
     }
 
@@ -395,13 +454,14 @@ public class CommandSettings {
      * Use this method to set the default prefix.
      * @param prefix The prefix to set. In case the given String is empty, this will throw a CommandSetException.
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
+     * @throws CommandSetException if a non-null prefix is empty.
      */
     public CommandSettings setDefaultPrefix(@Nonnull String prefix) {
-        if (prefix.matches(VALID_PREFIX))
+        if (!prefix.isEmpty())
             this.defaultPrefix = prefix;
-        else
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
+        else {
+            throw new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
+        }
         return this;
     }
 
@@ -412,24 +472,21 @@ public class CommandSettings {
      * @see MessageBuilder
      */
     public CommandSettings setUnknownCommandMessage(@Nullable Message message) {
-        if (message == null)
-            this.unknownCommandMessage = null;
-        else
-            this.unknownCommandMessage = new MessageBuilder(message).build();
+        this.unknownCommandMessage = message == null ? null : new MessageBuilder(message).build();
         return this;
     }
 
     /**
-     * Use this method to add a custom command prefix to a guild. This will only work if you instantiated this class with useCustomPrefixes set to true.
+     * Use this method to add a custom command prefix to a guild.
      * You can remove the custom prefix from a guild by setting its prefix to null.
      * @param guildId The guild id as a long.
      * @param prefix The nullable prefix to be set.
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if a non-null prefix does not match the requirements for a valid prefix.
+     * @throws CommandSetException if a non-null prefix is empty.
      */
     public CommandSettings setCustomPrefix(long guildId, @Nullable String prefix) {
-        if (prefix != null && !prefix.matches(VALID_PREFIX))
-            throw new CommandSetException(INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Prefix " + prefix + " is not valid"));
+        if (prefix != null && prefix.isEmpty())
+            throw new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         this.prefixMap.put(guildId, prefix);
         return this;
     }
@@ -439,13 +496,13 @@ public class CommandSettings {
      * prefixes for, because this bulk adds the Map parameter.
      * @param guildIdPrefixMap A Map which contains the prefix for each guild to add. Key: guild ID (Long), Value: prefix (String)
      * @return The current object. This is to use fluent interface.
-     * @throws CommandSetException if one of the prefixes is not valid.
+     * @throws CommandSetException if one of the prefixes is empty.
      */
     public CommandSettings setCustomPrefixes(@Nonnull Map<Long, String> guildIdPrefixMap) {
-        if (guildIdPrefixMap.values().stream().allMatch((prefix) -> prefix.matches(VALID_PREFIX)))
+        if (guildIdPrefixMap.values().stream().noneMatch(String::isEmpty))
             prefixMap.putAll(guildIdPrefixMap);
         else
-            throw new CommandSetException("One or more of the prefixes is not valid: " + INVALID_PREFIX_MESSAGE, new IllegalArgumentException("Invalid prefix"));
+            throw new CommandSetException("Prefix is not valid", new IllegalArgumentException(INVALID_PREFIX_MESSAGE));
         return this;
     }
 
@@ -479,6 +536,55 @@ public class CommandSettings {
      */
     public CommandSettings setResetCooldown(boolean resetCooldown) {
         this.resetCooldown = resetCooldown;
+        return this;
+    }
+
+    /**
+     * Specifies whether uncaught Exceptions that occur in command execution should be logged. You might want to disable this
+     * if you handle Exceptions manually or in the onException-listener. By default, this is true.
+     * @param logExceptions true, if uncaught Exceptions should be logged. False, if not.
+     * @return The current object. This is to use fluent interface.
+     * @see this#onException(BiConsumer)
+     */
+    public CommandSettings setLogExceptions(boolean logExceptions) {
+        this.logExceptions = logExceptions;
+        return this;
+    }
+
+
+    /**
+     * Sets a Consumer that will accept any command execution attempt in which the command label is unknown.
+     * @param action a Consumer that takes the event.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings onUnknownCommand(@Nonnull Consumer<CommandEvent> action) {
+        this.unknownCommandHandler = action;
+        return this;
+    }
+
+    /**
+     * Sets a BiConsumer that will accept any command execution attempt in which an uncaught Exception occurs.
+     * @param action a BiConsumer that takes the event and the corresponding Throwable that had been thrown.
+     * @return The current object. This is to use fluent interface.
+     */
+    public CommandSettings onException(@Nonnull BiConsumer<CommandEvent, Throwable> action) {
+        this.exceptionHandler = action;
+        return this;
+    }
+
+    /**
+     * Sets a message that will be sent in case someone is on cooldown. Generally speaking, it is rather recommended to use your own cooldown
+     * implementation for specific cases like that. Still, it is possible.
+     * Setting this to null removes the message. Nothing will be sent then.
+     * @param message Nullable Message object that will be wrapped in a new MessageBuilder to prevent the usage of already sent Messages. If this is null, the message is deactivated.
+     * @return The current object. This is to use fluent interface.
+     * @see MessageBuilder
+     */
+    public CommandSettings setCooldownMessage(@Nullable Message message) {
+        if (message == null)
+            this.cooldownMessage = null;
+        else
+            this.cooldownMessage = new MessageBuilder(message).build();
         return this;
     }
 
@@ -589,7 +695,7 @@ public class CommandSettings {
      * @param command The {@link com.github.johnnyjayjay.discord.commandapi.ICommand ICommand} instance to get the labels from
      * @return an unmodifiable Set of labels.
      */
-    public Set<String> getLabels(ICommand command) {
+    public Set<String> getLabels(@Nonnull ICommand command) {
         return Collections.unmodifiableSet(this.commands.keySet().stream().filter((label) -> this.commands.get(label).equals(command)).collect(Collectors.toSet()));
     }
     
@@ -653,28 +759,69 @@ public class CommandSettings {
     }
 
     /**
+     * Returns whether uncaught command exceptions are being logged.
+     * @return True, if this is enabled. False, if not.
+     */
+    public boolean isLogExceptions() {
+        return logExceptions;
+    }
+
+    /**
      * Transforms this instance to a String, showing the current set options.
      * @return This instance as a String.
      */
     @Override
     public String toString() {
         return "CommandSettings{" +
-                "unknownCommandMessage=" + unknownCommandMessage +
+                "labelIgnoreCase=" + labelIgnoreCase +
+                ", useShardManager=" + useShardManager +
+                ", unknownCommandMessage=" + unknownCommandMessage +
+                ", cooldownMessage=" + cooldownMessage +
                 ", defaultPrefix='" + defaultPrefix + '\'' +
                 ", cooldown=" + cooldown +
                 ", helpColor=" + helpColor +
+                ", check=" + check +
+                ", unknownCommandHandler=" + unknownCommandHandler +
+                ", exceptionHandler=" + exceptionHandler +
+                ", executorService=" + executorService +
                 ", blacklistedChannels=" + blacklistedChannels +
                 ", prefixMap=" + prefixMap +
                 ", commands=" + commands +
+                ", jda=" + jda +
+                ", listener=" + listener +
                 ", activated=" + activated +
-                ", labelIgnoreCase=" + labelIgnoreCase +
                 ", resetCooldown=" + resetCooldown +
                 ", botExecution=" + botExecution +
+                ", logExceptions=" + logExceptions +
                 '}';
+    }
+
+
+    protected void onUnknownCommand(CommandEvent event) {
+        this.unknownCommandHandler.accept(event);
+    }
+
+    protected void onException(CommandEvent event, Throwable throwable) {
+        this.exceptionHandler.accept(event, throwable);
     }
 
     protected Message getUnknownCommandMessage() {
         return unknownCommandMessage;
+    }
+
+    protected Message getCooldownMessage() {
+        return cooldownMessage;
+    }
+
+    protected boolean mayCall(CommandEvent event) {
+        return check.test(event);
+    }
+
+    protected void execute(Runnable command) {
+        if (executorService != null)
+            executorService.execute(command);
+        else
+            command.run(); // is das gut? keine ahnung
     }
 
     protected Map<String, ICommand> getCommands() {
