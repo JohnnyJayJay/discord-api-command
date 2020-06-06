@@ -40,7 +40,7 @@ If you use Maven, you can add this library even less complicated: Just add the f
 And that's it!
 
 ## Getting started
-### Wrting Commands
+### Writing Commands
 Generally speaking, there are two ways to write your own commands.
 
 #### Implementing ICommand directly
